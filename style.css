@@ -1,0 +1,2315 @@
+/* Area konten utama agar mendorong footer */
+main {
+  flex: 1;
+}
+footer {
+  text-align: center;
+  padding: 10px 0;
+  background: linear-gradient(
+    90deg,
+    rgba(10, 25, 47, 0.6),
+    rgba(2, 10, 25, 0.6)
+  );
+  color: white;
+  font-size: 14px;
+  width: 100%;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
+  border: none;
+}
+
+/* ============================= */
+/* === LOGIN PAGE STYLE START === */
+/* ============================= */
+
+/* ====== Struktur Utama ====== */
+#loginPage {
+  display: flex;
+  flex-direction: row;
+  width: 100vw;
+  height: 100vh;
+  font-family: "Poppins", sans-serif;
+  overflow: hidden;
+}
+
+/* ====== Sisi kiri (Wallpaper & Branding) ====== */
+.login-wallpaper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 50px;
+  color: white;
+  overflow: hidden;
+  animation: fadeIn 0.8s ease;
+}
+
+/* 🔥 Fullscreen Video Background */
+.bg-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* menjaga ukuran tetap proporsional */
+  z-index: 0;
+  filter: brightness(0.78); /* sedikit gelap supaya teks terlihat */
+}
+
+/* Overlay lebih cerah */
+.login-wallpaper .overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.15);
+  z-index: 1;
+}
+
+.branding {
+  position: relative;
+  z-index: 2;
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.5);
+}
+
+.branding h1 {
+  font-size: 44px;
+  margin: 0 0 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.branding h1 span {
+  display: block;
+  font-size: 34px;
+  font-weight: 500;
+  opacity: 0.95;
+  margin-top: 8px;
+}
+
+.branding p {
+  font-size: 20px;
+  margin-top: 10px;
+  opacity: 0.9;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+/* Responsif */
+@media (max-width: 768px) {
+  .login-wallpaper {
+    height: 45vh;
+    padding: 30px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .branding h1 {
+    font-size: 34px;
+  }
+
+  .branding h1 span {
+    font-size: 26px;
+  }
+
+  .branding p {
+    font-size: 16px;
+  }
+}
+
+/* ====== Sisi kanan (Form Login) ====== */
+.login-card {
+  flex: 0 0 420px;
+  background: linear-gradient(145deg, #ffffff 0%, #f3f7fa 40%, #eaf1f8 100%);
+  padding: 60px 45px;
+  border-radius: 0;
+  box-shadow: -3px 0 30px rgba(0, 0, 0, 0.12);
+  text-align: center;
+  animation: slideInRight 0.6s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Logo */
+.login-header {
+  margin-bottom: 35px;
+}
+
+.login-logo {
+  width: 200px;
+  height: 100px;
+  object-fit: contain;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.1));
+}
+
+.login-card h2 {
+  color: #003b7a;
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, #0071bc, #004a91);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.login-subtitle {
+  color: #7a8a9e;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+/* Input Fields */
+.login-card input {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 18px;
+  border-radius: 12px;
+  border: 1.4px solid #cfd9e3;
+  background: rgba(255, 255, 255, 0.85);
+  font-size: 15px;
+  color: #2c3e50;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.login-card input:focus {
+  border-color: #1abc9c;
+  box-shadow: 0 0 10px rgba(26, 188, 156, 0.25);
+}
+
+/* Input Password Toggle */
+.password-container {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+/* Login Button */
+.login-card button {
+  width: 100%;
+  background: linear-gradient(90deg, #0071bc, #004a91);
+  color: #ffffff;
+  font-weight: 600;
+  border: none;
+  padding: 13px;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.login-card button:hover {
+  background: linear-gradient(90deg, #008ae6, #0055a4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 105, 180, 0.3);
+}
+
+/* ====== Loader ====== */
+#loader {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 10, 30, 0.8);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  color: white;
+  font-size: 18px;
+  text-align: center;
+  padding-top: 20%;
+}
+
+.spinner {
+  width: 70px;
+  height: 70px;
+  border: 6px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #00bcd4;
+  border-radius: 50%;
+  margin: 0 auto 20px auto;
+  animation: spin 1s linear infinite, glow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 10px #00bcd4;
+  }
+  to {
+    box-shadow: 0 0 25px #00bcd4;
+  }
+}
+
+/* === LOADER OVERLAY UNTUK LOGOUT === */
+.loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 15, 20, 0.8);
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  color: #fff;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 5px solid rgba(255, 255, 255, 0.3);
+  border-top: 5px solid #00d4ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ====== Pesan Error ====== */
+.login-error {
+  color: #e74c3c;
+  font-size: 14px;
+  margin-top: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+/* ========================= */
+/* ===== HEADER SECTION ===== */
+/* ========================= */
+
+header {
+  width: 100%;
+  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 20px 0 15px;
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  box-shadow: 0 3px 18px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ====== Container utama ====== */
+.header-container {
+  width: 100%;
+  max-width: 1000px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* ====== Info User di pojok kiri atas ====== */
+.user-info {
+  position: fixed; /* tetap di kiri atas layar */
+  top: 10px;
+  left: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 8px 14px;
+  border-radius: 8px;
+  z-index: 200; /* selalu di atas header */
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(6px);
+}
+
+.user-info img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid white;
+  object-fit: cover;
+}
+
+.user-info span {
+  font-size: 15px;
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ====== Judul Header ====== */
+.header-text h1 {
+  margin: 0;
+  font-size: 2.1em;
+  color: #ffffff;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* ====== LINK NAVIGASI ====== */
+.header-links {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px 8px;
+  border-radius: 8px;
+  backdrop-filter: blur(4px);
+}
+
+.header-links a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.header-links a:hover {
+  background: linear-gradient(135deg, #2563eb, #1e3a8a);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* ====== Jam di kanan atas ====== */
+.header-date {
+  position: fixed;
+  top: 12px;
+  right: 22px;
+  font-size: 1.1em;
+  color: #dbeafe;
+  font-weight: 600;
+  z-index: 200;
+}
+
+/* ====== Tombol Logout di bawah jam ====== */
+.logout-btn {
+  position: fixed;
+  top: 65px;
+  right: 22px;
+  padding: 10px 18px;
+  background: linear-gradient(90deg, #ff4d4f, #d9363e);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transition: all 0.3s ease;
+  z-index: 200;
+}
+
+.logout-btn:hover {
+  background: linear-gradient(90deg, #ff7875, #ff4d4f);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+/* AREA DROPDOWN NOTIF */
+.notif-dropdown {
+  display: none;
+  position: absolute;
+  top: 35px;
+  right: 0;
+
+  width: 900px !important; /* Lebarkan area agar muat 3 tabel */
+  max-height: 700px !important;
+
+  overflow-y: auto;
+  background: white;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  z-index: 999;
+  transition: 0.3s ease;
+}
+
+.notif-dropdown.active {
+  display: block !important;
+}
+
+/* 🔥 Container panel menjadi horizontal */
+#notifDetailContainer {
+  display: flex;
+  flex-wrap: wrap; /* agar 3 panel bisa turun jika tidak muat */
+  gap: 15px;
+  width: 100%;
+}
+
+/* 🔥 Panel tabel tampil berdampingan */
+.panel-box {
+  flex: 1 1 calc(33% - 15px);
+  /* 3 kolom (33%-15px karena gap) */
+
+  min-width: 280px; /* agar responsif di layar kecil */
+  max-width: 340px;
+
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  border-left: 4px solid #007bff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+}
+
+.notif-bell {
+  font-size: 26px;
+  cursor: pointer;
+  position: relative;
+}
+
+.notif-badge {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  background: red;
+  color: white;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 50%;
+}
+
+.notif-dropdown {
+  display: none;
+  position: absolute;
+  top: 35px;
+  right: 0;
+  width: 260px; /* tetap kecil */
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  z-index: 999;
+}
+
+/* PANEL DETAIL DI LUAR DROPDOWN */
+#notifDetailContainer {
+  display: flex; /* side by side */
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.panel-box {
+  min-width: 320px;
+  background: white;
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #007bff;
+}
+
+.panel-title {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* ====== WRAPPER TOMBOL ====== */
+/* ====== WRAPPER TOMBOL ====== */
+.menu-wrapper {
+  position: absolute;
+  bottom: 15px;
+  left: 25px;
+  display: flex;
+  gap: 10px;
+}
+
+/* ====== Tombol ====== */
+.slide-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.slide-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(2px);
+}
+
+/* ====== Tombol Monitoring ====== */
+.monitoring-btn {
+  background: rgba(14, 165, 233, 0.8);
+}
+
+.monitoring-btn:hover {
+  background: rgba(2, 132, 199, 1);
+}
+
+/* ====== PANEL ====== */
+.slide-panel {
+  position: absolute;
+  top: calc(100% + 5px); /* muncul DI BAWAH tombol */
+  left: 0;
+  background: rgba(240, 247, 255, 0.98);
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  max-height: 0;
+  width: 220px;
+  transition: max-height 0.5s ease, padding 0.3s ease;
+  z-index: 99;
+  padding: 0 15px;
+}
+
+/* ====== PANEL MONITORING ====== */
+.monitoring-panel {
+  left: 230px; /* geser ke tombol kedua */
+}
+.slide-panel.open {
+  max-height: 250px;
+  padding: 15px;
+}
+
+.slide-panel a {
+  display: block;
+  padding: 10px 0;
+  text-decoration: none;
+  color: #1e3a8a;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(30, 58, 138, 0.1);
+  transition: color 0.3s;
+}
+
+.slide-panel a:last-child {
+  border-bottom: none;
+}
+
+.slide-panel a:hover {
+  color: #2563eb;
+}
+
+/* ====== ICON MENU ====== */
+.menu-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15));
+}
+/* ====== Loader Overlay ====== */
+#loaderOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+#loaderOverlay.active {
+  display: flex;
+}
+
+/* ====== Spinner ====== */
+.spinner {
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #3b82f6;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 768px) {
+  .header-text h1 {
+    font-size: 20px;
+  }
+
+  .user-info {
+    top: 8px;
+    left: 8px;
+    padding: 6px 10px;
+  }
+
+  .user-info img {
+    width: 38px;
+    height: 38px;
+  }
+
+  .logout-btn {
+    top: 75px;
+    right: 10px;
+    padding: 8px 14px;
+  }
+}
+
+/* ====== GLOBAL ====== */
+* {
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+  transition: all 0.25s ease;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  /* Ubahan di sini: gunakan gambar wallpaper */
+  background: url("https://i.postimg.cc/vZ2PTnJ0/light-radiance-lines-waves-wallpaper-preview.jpg")
+    no-repeat center center fixed;
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #1e293b;
+}
+
+/* ====================================================
+   MAIN CARD — FUTURISTIC GLASS PANEL
+==================================================== */
+main {
+  width: 94%;
+  max-width: 1500px;
+  margin: 40px auto;
+  padding: 45px 60px;
+
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+
+  background-image: linear-gradient(
+    140deg,
+    rgba(255, 255, 255, 0.35),
+    rgba(220, 235, 255, 0.16)
+  );
+
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.18),
+    0 0 25px rgba(137, 207, 255, 0.25);
+
+  transition: all 0.45s ease;
+  animation: fadeIn 1.1s ease-out;
+}
+
+main:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.25),
+    0 0 35px rgba(120, 180, 255, 0.35);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ====================================================
+   FORM SECTION — FUTURISTIC HOLOGRAM PANEL
+==================================================== */
+.form-section {
+  position: relative;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(200, 220, 255, 0.6);
+  border-radius: 18px;
+  padding: 35px 40px;
+  margin-bottom: 30px;
+
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.07), 0 0 12px rgba(140, 180, 255, 0.25);
+
+  overflow: hidden;
+  transition: 0.45s ease;
+}
+
+/* Glass sliding effect */
+.form-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 120%;
+  height: 100%;
+
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(180, 210, 255, 0.2),
+    rgba(255, 255, 255, 0.1)
+  );
+  transition: transform 0.6s ease;
+  pointer-events: none;
+}
+
+.form-section:hover::before {
+  transform: translateX(120%);
+}
+
+/* Border sweep animation */
+.form-section::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  border: 1px solid rgba(150, 190, 255, 0.3);
+
+  pointer-events: none;
+
+  mask: linear-gradient(90deg, transparent, white, transparent);
+  -webkit-mask: linear-gradient(90deg, transparent, white, transparent);
+
+  animation: sweep 3s linear infinite;
+}
+
+@keyframes sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Header */
+.form-section h2 {
+  margin-bottom: 20px;
+  font-size: 1.5em;
+  font-weight: 700;
+  color: #143f85;
+
+  letter-spacing: 0.4px;
+  border-bottom: 2px solid rgba(90, 150, 255, 0.6);
+  padding-bottom: 8px;
+}
+
+.header-date {
+  margin-left: auto;
+  color: #000;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* ====================================================
+   GRID
+==================================================== */
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 26px;
+}
+
+/* ====================================================
+   FORM ELEMENT
+==================================================== */
+label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.95em;
+  color: #2b3340;
+  margin-bottom: 7px;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 0.95em;
+  color: #1f2937;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 12px;
+  border: 1px solid rgba(180, 195, 220, 0.8);
+  transition: 0.25s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+/* ====================================================
+   BUTTON — FUTURISTIC
+==================================================== */
+.submit-btn {
+  padding: 14px 36px;
+  font-size: 1.05em;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  border: none;
+
+  background: linear-gradient(135deg, #2d68f5, #153a94);
+  color: white;
+
+  box-shadow: 0 4px 18px rgba(37, 99, 235, 0.35),
+    0 0 12px rgba(110, 160, 255, 0.4);
+
+  transition: 0.25s ease;
+}
+
+.submit-btn:hover {
+  background: linear-gradient(135deg, #1d4ed8, #102e7a);
+  box-shadow: 0 6px 22px rgba(30, 64, 175, 0.45),
+    0 0 18px rgba(100, 140, 255, 0.5);
+}
+
+/* ====================================================
+   TABLE
+==================================================== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 26px;
+  border-radius: 16px;
+  overflow: hidden;
+
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.06), 0 0 16px rgba(140, 180, 255, 0.22);
+}
+
+th,
+td {
+  padding: 15px 18px;
+  text-align: center;
+  font-size: 0.95em;
+  border: 1px solid rgba(220, 230, 255, 0.8);
+}
+
+th {
+  background: linear-gradient(135deg, #153a94, #2e67f0);
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) {
+  background: rgba(235, 242, 255, 0.65);
+}
+
+tr:hover {
+  background: rgba(37, 99, 235, 0.12);
+}
+
+td:first-child {
+  font-weight: 700;
+  color: #18315c;
+}
+
+/* ====================================================
+   RADIO & CHECKBOX
+==================================================== */
+input[type="radio"],
+input[type="checkbox"] {
+  accent-color: #2563eb;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+/* ====================================================
+   RESPONSIVE
+==================================================== */
+@media (max-width: 768px) {
+  .form-section {
+    padding: 26px 24px;
+  }
+  .submit-btn {
+    width: 100%;
+  }
+}
+
+/* === PANEL LAPORAN - STYLE PROFESIONAL === */
+.report-section {
+  display: none; /* Panel tersembunyi di awal */
+  padding: 30px;
+  background: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 15px;
+  max-width: 1200px;
+  margin: 30px auto;
+  animation: fadeIn 0.4s ease;
+}
+
+.report-section h1 {
+  font-size: 28px;
+  color: #333;
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+/* Tombol-tombol */
+.btn {
+  background: linear-gradient(90deg, #4f8cf7, #006eff);
+  color: #fff;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  margin: 0 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(90deg, #006eff, #0045cc);
+}
+
+.form-section {
+  display: none;
+  animation: fade 0.3s ease;
+}
+
+.form-section.active {
+  display: block;
+}
+
+.wizard-btn {
+  margin-top: 25px;
+  padding: 10px 20px;
+  border: none;
+  background: #1e40af;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.wizard-btn:hover {
+  background: #1e3a8a;
+}
+
+.wizard-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== Wizard Step Indicator ===== */
+.wizard-progress {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.wizard-progress .step {
+  text-align: center;
+  width: 100%;
+  position: relative;
+}
+
+.wizard-progress .step-number {
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  border-radius: 50%;
+  background: #d8d8d8;
+  color: #444;
+  margin: 0 auto 8px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.wizard-progress .step.active .step-number {
+  background: #0078ff;
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 120, 255, 0.3);
+  transform: scale(1.08);
+}
+
+.step-label {
+  font-size: 13px;
+  color: #555;
+}
+
+.wizard-progress .step::after {
+  content: "";
+  position: absolute;
+  top: 20px;
+  right: -50%;
+  width: 100%;
+  height: 3px;
+  background: #ccc;
+}
+
+.wizard-progress .step:last-child::after {
+  display: none;
+}
+
+.wizard-progress .step.active ~ .step .step-number {
+  background: #eaeaea !important;
+  color: #888 !important;
+}
+
+/* ================== PANEL LAPORAN ================== */
+.report-section {
+  padding: 30px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  animation: fadeIn 0.5s ease;
+  margin: 0 auto;
+  max-width: 96%; /* ✅ Biar lebar, tapi tetap ada margin kiri-kanan */
+}
+
+/* === TABEL TANPA SCROLL === */
+#reportTable.full-width {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  table-layout: fixed; /* ✅ Membuat kolom lebar merata dan responsif */
+}
+
+/* HEADER TABEL */
+#reportTable thead th {
+  background-color: #0078ff;
+  color: white;
+  padding: 12px;
+  text-align: center;
+  font-weight: 600;
+  border: none;
+}
+
+/* BODY TABEL */
+#reportTable tbody td {
+  padding: 10px 12px;
+  text-align: center;
+  border-bottom: 1px solid #e6e6e6;
+  word-wrap: break-word; /* ✅ Agar teks panjang tidak keluar */
+}
+
+/* GANTI BACKGROUND BARIS GENAP */
+#reportTable tbody tr:nth-child(even) {
+  background-color: #f9faff;
+}
+
+/* HOVER EFEK */
+#reportTable tbody tr:hover {
+  background-color: #e6f2ff;
+  cursor: pointer;
+}
+
+/* FOTO BUKTI */
+#reportTable tbody td img {
+  width: 60px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 5px;
+  border: 2px solid #ddd;
+}
+
+/* TOMBOL */
+.btn {
+  padding: 8px 15px;
+  border-radius: 6px;
+  background: #0275d8;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+.btn:hover {
+  opacity: 0.9;
+}
+
+/* ANIMASI */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* RESPONSIF (MOBILE) */
+@media (max-width: 768px) {
+  #reportTable thead {
+    display: none;
+  }
+
+  #reportTable tbody td {
+    display: block;
+    text-align: right;
+    padding-left: 50%;
+    position: relative;
+  }
+
+  #reportTable tbody td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #333;
+    white-space: nowrap;
+  }
+}
+.report-section .btn {
+  float: right; /* Memposisikan tombol ke sebelah kanan */
+  background-color: #007bff; /* Warna latar belakang tombol (biru) */
+  color: white; /* Warna teks tombol */
+  border: none; /* Menghilangkan border tombol */
+  padding: 10px 20px; /* Padding tombol */
+  text-align: center; /* Teks di tengah */
+  text-decoration: none; /* Menghilangkan garis bawah pada teks */
+  display: inline-block; /* Membuat tombol menjadi inline block */
+  font-size: 16px; /* Ukuran font */
+  margin: 4px 2px; /* Margin tombol */
+  cursor: pointer; /* Menampilkan kursor pointer */
+  border-radius: 5px; /* Sudut melengkung */
+}
+
+/* Menghapus efek hover */
+.report-section .btn:hover {
+  background-color: #007bff; /* Tetap biru saat hover */
+}
+
+.search-section {
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.search-section .input-box {
+  width: 250px;
+  padding: 5px;
+  margin-bottom: 10px;
+}
+
+.btn-clear {
+  margin-left: 10px;
+  padding: 6px 12px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+/* ============================================
+   PROFESSIONAL BLUE BUTTONS (UNIFIED STYLE)
+   Pertamina Futuristic UI — All Blue Variant
+============================================ */
+
+/* Base style tombol — ukuran sama */
+.table-btn {
+  width: 115px; /* sedikit lebih lebar agar proporsional */
+  padding: 8px 16px;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s ease;
+  letter-spacing: 0.3px;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #007bff, #0097ff);
+  box-shadow: 0 3px 8px rgba(0, 140, 255, 0.35);
+}
+
+/* Ikon */
+.table-btn i {
+  font-size: 14px;
+  pointer-events: none;
+}
+
+/* Hover */
+.table-btn:hover {
+  background: linear-gradient(135deg, #1190ff, #33afff);
+  box-shadow: 0 5px 14px rgba(0, 160, 255, 0.45);
+  transform: translateY(-2px);
+}
+
+/* Saat ditekan */
+.table-btn:active {
+  transform: scale(0.95);
+}
+
+/* Variasi kecil untuk membedakan fungsi (tetap biru) */
+.view-btn {
+  background: linear-gradient(135deg, #0071e3, #00a0ff);
+}
+
+.view-btn:hover {
+  background: linear-gradient(135deg, #1b8fff, #40baff);
+}
+
+.edit-btn {
+  background: linear-gradient(135deg, #0064d6, #008cff);
+}
+
+.edit-btn:hover {
+  background: linear-gradient(135deg, #1c7eff, #4db3ff);
+}
+
+.delete-btn {
+  background: linear-gradient(135deg, #004fbb, #0077e6);
+}
+
+.delete-btn:hover {
+  background: linear-gradient(135deg, #1c6ed6, #3da0ff);
+}
+
+/* ===== Loader Spinner (Versi Besar) ===== */
+.loader {
+  border: 6px solid #e5e7eb; /* Warna abu lembut */
+  border-top: 6px solid #2563eb; /* Warna biru bagian atas */
+  border-radius: 50%;
+  width: 50px; /* Lebar lingkaran */
+  height: 50px; /* Tinggi lingkaran */
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 10px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* 🔢 Gaya untuk nomor halaman */
+#pagination {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.page-number,
+.page-btn {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  font-size: 14px;
+  background: #f9f9f9;
+  transition: all 0.2s ease;
+}
+
+.page-number:hover,
+.page-btn:hover {
+  background: #e0e7ff;
+  border-color: #6366f1;
+}
+
+.page-number.active {
+  background: #4f46e5;
+  color: white;
+  border-color: #4338ca;
+  font-weight: bold;
+}
+
+/* ====== MODAL DETAIL FULL SCREEN ====== */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto; /* scroll jika konten panjang */
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 0; /* hapus padding-top */
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 0 auto;
+  padding: 20px 25px;
+  border-radius: 0; /* hapus rounded corners agar full screen */
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  box-shadow: none;
+  position: relative;
+  animation: slideDown 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; /* scroll di dalam modal */
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.close-btn {
+  color: #aaa;
+  font-size: 28px;
+  font-weight: bold;
+  position: absolute;
+  top: 10px;
+  right: 18px;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.close-btn:hover {
+  color: #000;
+}
+
+/* ====== TABEL DETAIL ====== */
+#detailTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+#detailTable th,
+#detailTable td {
+  border: 1px solid #e0e0e0;
+  padding: 10px;
+  text-align: left;
+}
+
+#detailTable th {
+  background: #f7faff;
+  width: 30%;
+  font-weight: 600;
+}
+
+#detailTable td {
+  background: #fff;
+}
+
+/* ====== TOMBOL TUTUP MODAL ====== */
+.modal-footer {
+  margin-top: 20px;
+  text-align: right;
+  padding-top: 10px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.modal-footer button {
+  background-color: #007bff; /* biru */
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.modal-footer button:hover {
+  background-color: #0056b3; /* biru lebih gelap saat hover */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.modal-footer button:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* ==== HEADER PERUSAHAAN DETAIL MODAL ==== */
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  padding: 20px 0;
+  border-bottom: 3px solid #e8e8e8;
+  margin-bottom: 25px;
+}
+
+.company-logo {
+  max-height: 110px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.company-info {
+  flex-grow: 1;
+}
+
+.company-info h1 {
+  font-size: 30px;
+  margin: 0 0 8px;
+  font-weight: 800;
+  color: #222;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.company-info h2 {
+  font-size: 22px;
+  margin: 0 0 15px;
+  font-weight: 600;
+  color: #555;
+  letter-spacing: 0.3px;
+}
+
+.company-info p {
+  font-size: 15px;
+  margin: 3px 0;
+  color: #444;
+  line-height: 1.5;
+}
+
+.company-info p strong {
+  color: #111;
+}
+
+/* Responsif untuk layar kecil */
+@media (max-width: 768px) {
+  .modal-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+
+  .company-info h1 {
+    font-size: 24px;
+  }
+
+  .company-info h2 {
+    font-size: 18px;
+  }
+
+  .company-logo {
+    max-height: 90px;
+  }
+}
+
+/* Header tabel tidak ikut scroll saat render html2canvas */
+#detailContent table thead {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: white !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ====== Tombol agar tidak ikut masuk PDF ====== */
+.no-print {
+  display: none;
+}
+
+@media screen {
+  .no-print {
+    display: inline-block;
+  }
+}
+
+/* ====================== BAGIAN A & B: TABEL STANDAR ====================== */
+.form-section table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 16px; /* ✅ Lebih besar dan jelas */
+}
+
+.form-section table th,
+.form-section table td {
+  padding: 12px 16px;
+  border: 1px solid #333;
+  text-align: left;
+  vertical-align: top;
+}
+
+.form-section table th:first-child {
+  width: 28%;
+  background-color: #f3f4f6;
+  font-weight: bold;
+}
+
+/* ====================== BAGIAN C: HASIL UJI DAN LAPORAN ====================== */
+.form-section .bagian-c table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  font-size: 16px;
+  transform: scale(0.96);
+  transform-origin: top left;
+}
+
+.form-section .bagian-c table th,
+.form-section .bagian-c table td {
+  padding: 12px 16px;
+  border: 1px solid #333;
+  text-align: center;
+}
+
+.form-section .bagian-c table th:nth-child(1),
+.form-section .bagian-c table td:nth-child(1) {
+  width: 35%;
+}
+
+.form-section .bagian-c table th:nth-child(2),
+.form-section .bagian-c table td:nth-child(2),
+.form-section .bagian-c table th:nth-child(3),
+.form-section .bagian-c table td:nth-child(3) {
+  width: 19%;
+}
+
+/* ✅ Page Break setelah Bagian C */
+.form-section .bagian-c {
+  page-break-after: always;
+}
+
+/* ====================== TEKS & INPUT ====================== */
+.form-section input,
+.form-section textarea {
+  background: #fff;
+  border: 1px solid #333;
+  padding: 6px 10px;
+  font-size: 16px;
+  color: #000;
+}
+
+/* ====================== CETAK (PRINT) STYLING ====================== */
+@media print {
+  #detailContent {
+    font-size: 18px; /* 🔍 Lebih besar saat cetak */
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    zoom: 0.82; /* ✅ Sesuaikan agar pas di A4 */
+  }
+
+  .form-section table {
+    font-size: 16px;
+    border-width: 1.4px;
+  }
+
+  .form-section .bagian-c table {
+    transform: scale(1); /* ✅ Kembalikan full scale */
+    font-size: 16px;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* ✅ Judul, Label, Teks lebih tebal */
+#detailContent h1,
+#detailContent h2,
+#detailContent h3,
+#detailContent label,
+#detailContent table td,
+#detailContent table th {
+  font-weight: 600;
+  color: #000 !important;
+}
+/* ====================== BAGIAN E: LAPORAN PEKERJAAN ====================== */
+.form-section.bagian-e {
+  font-size: 18px !important; /* Perbesar teks utama Bag E */
+  line-height: 1.7;
+}
+
+.form-section.bagian-e textarea,
+.form-section.bagian-e input {
+  font-size: 18px !important; /* Perbesar teks di dalam input dan textarea */
+  padding: 10px 12px;
+  border: 1px solid #333;
+  background-color: #fff;
+}
+
+.modal-section {
+  margin-bottom: 22px;
+}
+
+.modal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.modal-grid input {
+  width: 100%;
+  padding: 6px 8px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.modal-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.modal-table th,
+.modal-table td {
+  border: 1px solid #ccc;
+  padding: 6px;
+}
+
+.textarea-box {
+  border: 1px solid #ccc;
+  padding: 10px;
+  min-height: 80px;
+  background: #fff;
+}
+
+.signature-table td {
+  height: 70px;
+  border-top: 1px solid #000;
+}
+
+/* ====== BAGIAN LAPORAN FOTO PER NOMOR PEKERJAAN ====== */
+.photo-report-section {
+  display: none;
+  padding: 20px;
+  background: #f9fafc;
+  min-height: calc(100vh - 100px);
+  box-sizing: border-box;
+}
+
+.photo-report-section h1 {
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 1.6rem;
+  color: #2d3e50;
+}
+
+.photo-report-actions {
+  text-align: right;
+  margin-bottom: 15px;
+}
+
+.photo-report-actions button {
+  background-color: #4caf50;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.photo-report-actions button:hover {
+  background-color: #43a047;
+}
+
+/* ====== TABLE RESPONSIVE ====== */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto; /* scroll horizontal jika tabel terlalu lebar */
+  padding: 0;
+  margin: 0 auto;
+}
+
+/* ====== TABEL LAPORAN FOTO ====== */
+.photo-report-table {
+  width: 100%;
+  min-width: 900px; /* Ukuran minimum tabel */
+  border-collapse: collapse;
+  border-spacing: 0;
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  table-layout: fixed; /* Agar kolom tetap fleksibel tapi rata */
+}
+
+.photo-report-table thead {
+  background-color: #34495e;
+  color: white;
+}
+
+.photo-report-table th,
+.photo-report-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #e0e0e0;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 0.85rem;
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+/* ====== KOLOM PROPORSIONAL ====== */
+.photo-report-table th:nth-child(1) {
+  width: 5%;
+} /* No */
+.photo-report-table th:nth-child(2) {
+  width: 15%;
+} /* Nomor Pekerjaan */
+.photo-report-table th:nth-child(3) {
+  width: 15%;
+} /* Nama User */
+.photo-report-table th:nth-child(4) {
+  width: 12%;
+} /* Department */
+.photo-report-table th:nth-child(5) {
+  width: 10%;
+} /* Vehicle ID */
+.photo-report-table th:nth-child(6) {
+  width: 12%;
+} /* Progres Status */
+.photo-report-table th:nth-child(7) {
+  width: 21%;
+} /* Deskripsi Pekerjaan */
+.photo-report-table th:nth-child(8) {
+  width: 10%;
+} /* Foto Bukti */
+
+/* ====== KOLOM FOTO ====== */
+.photo-report-table img {
+  width: 65px;
+  height: 65px;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+/* ====== PESAN KOSONG ====== */
+.no-data-message {
+  text-align: center;
+  font-size: 0.95rem;
+  color: #888;
+  padding: 18px;
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 1024px) {
+  .photo-report-table th,
+  .photo-report-table td {
+    font-size: 0.8rem;
+    padding: 8px 6px;
+  }
+  .photo-report-table img {
+    width: 55px;
+    height: 55px;
+  }
+}
+
+@media (max-width: 768px) {
+  .photo-report-table th:nth-child(5),
+  .photo-report-table td:nth-child(5) {
+    display: none; /* Sembunyikan Deskripsi di layar kecil */
+  }
+  .photo-report-actions button {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 576px) {
+  .photo-report-table th:nth-child(3),
+  .photo-report-table td:nth-child(3),
+  .photo-report-table th:nth-child(4),
+  .photo-report-table td:nth-child(4) {
+    display: none; /* Sembunyikan kolom tertentu di layar sangat kecil */
+  }
+}
+/* ===== Loader Spinner (untuk laporan foto) ===== */
+.loader {
+  border: 6px solid #e5e7eb; /* Warna abu lembut */
+  border-top: 6px solid #2563eb; /* Warna biru bagian atas */
+  border-radius: 50%;
+  width: 45px; /* Ukuran lingkaran */
+  height: 45px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 10px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+#photoPagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 15px;
+}
+.page-number {
+  padding: 5px 10px;
+  border: 1px solid #007bff;
+  background: white;
+  color: #007bff;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+.page-number:hover {
+  background: #007bff;
+  color: white;
+}
+.page-number.active {
+  background: #007bff;
+  color: white;
+}
+/* === Loader Download Excel === */
+.loader-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.loader-box {
+  text-align: center;
+  background: white;
+  padding: 30px 50px;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  font-family: "Poppins", sans-serif;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 6px solid #ddd;
+  border-top-color: #007acc;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 15px auto;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loader-box p {
+  font-size: 15px;
+  color: #333;
+  margin: 0;
+}
+.hidden {
+  display: none !important;
+}
+
+#vtsSection {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+#vtsSection .table-responsive {
+  width: 95%; /* 🔥 bikin hampir full layar */
+  max-width: 1400px; /* batas maksimal biar tetap rapi */
+}
+#vtsTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+.slide-panel {
+  max-height: 0; /* default tertutup */
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+/* saat dibuka */
+.slide-panel.open {
+  max-height: 80vh; /* tinggi maksimal + scroll */
+  overflow-y: auto;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+
+  /* 🔥 BUKAN FULL LAYAR LAGI */
+  width: 92%;
+  max-width: 1400px;
+
+  margin: 15px auto; /* center + otomatis kiri kanan */
+
+  padding: 20px;
+
+  box-sizing: border-box;
+
+  /* 🔥 BIAR BACKGROUND MASIH TERLIHAT */
+  background: rgba(180, 210, 255, 0.15);
+  backdrop-filter: blur(10px);
+
+  border: 1px solid rgba(180, 210, 255, 0.3);
+  border-radius: 14px;
+}
+
+.form-grid input,
+.form-grid select,
+.form-grid textarea {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  width: 100%;
+  font-size: 14px;
+}
+
+.form-grid textarea {
+  grid-column: span 3;
+}
+.report-section {
+  width: 100%;
+  max-width: 100% !important;
+}
+grid-template-columns: repeat(4, 1fr);
+
+/* ===== WRAPPER (BIAR TIDAK FULL LAYAR) ===== */
+.dashboard-wrapper {
+  max-width: 1100px;
+  margin: auto;
+}
+
+/* ===== CONTAINER KPI (FIX LEBAR) ===== */
+.kpi-container {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(140px, 180px)
+  ); /* 🔥 batasi ukuran */
+  justify-content: center; /* 🔥 center */
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+/* ===== KPI CARD ===== */
+.kpi-box {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 10px 12px; /* 🔥 lebih kecil */
+  border: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+/* hover halus */
+.kpi-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== LABEL ===== */
+.kpi-box span {
+  font-size: 11px;
+  color: #6b7280;
+  letter-spacing: 0.3px;
+}
+
+/* ===== VALUE ===== */
+.kpi-box h2 {
+  font-size: 18px; /* 🔥 lebih compact */
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+/* ===== SMALL INFO ===== */
+.kpi-sub {
+  font-size: 10px;
+  color: #9ca3af;
+}
+
+/* ===== COLOR ACCENT ===== */
+.kpi-box::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  border-radius: 10px 0 0 10px;
+}
+
+/* warna tiap card */
+.kpi-box.total::before {
+  background: #3b82f6;
+}
+.kpi-box.month::before {
+  background: #10b981;
+}
+.kpi-box.update::before {
+  background: #f59e0b;
+}
+.kpi-box.progress::before {
+  background: #ef4444; /* merah (status aktif / berjalan) */
+}
+
+/* ===== CHART AREA (DIBESARKAN) ===== */
+.chart-box {
+  height: 380px; /* 🔥 lebih tinggi biar dominan */
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== FILTER BOX (BIAR RAPI) ===== */
+.filter-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  justify-content: center;
+}
+
+.filter-box select {
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.filter-box button {
+  padding: 6px 12px;
+  border: none;
+  background: #3b82f6;
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+  .kpi-box h2 {
+    font-size: 16px;
+  }
+
+  .chart-box {
+    height: 300px;
+  }
+}
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  background: #fff;
+  margin: 5% auto;
+  padding: 20px;
+  width: 80%;
+  border-radius: 10px;
+}
+
+.close {
+  float: right;
+  cursor: pointer;
+  font-size: 22px;
+}
+/* ===== SECTION ===== */
+.report-section {
+  display: none;
+}
+
+.report-section.active {
+  display: block;
+}
+
+/* ===== WRAPPER SCROLL ===== */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-radius: 10px;
+}
+
+/* ===== TABLE ===== */
+#detailTable {
+  width: 100%;
+  min-width: 1200px;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+/* ===== HEADER ===== */
+#detailTable thead {
+  background: #2563eb;
+  color: white;
+}
+
+#detailTable thead th {
+  background: linear-gradient(90deg, #1e3a8a, #3b82f6);
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+/* ===== BODY ===== */
+#detailTable tbody td {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+/* ===== HOVER ===== */
+#detailTable tbody tr:hover {
+  background: #f1f5f9;
+}
+
+/* ===== STATUS WARNA ===== */
+.active {
+  color: green;
+  font-weight: bold;
+}
+
+.inactive {
+  color: red;
+  font-weight: bold;
+}
+/* TOMBOL DOWNLOAD */
+.btn-download {
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+  transition: all 0.25s ease;
+}
+
+/* HOVER */
+.btn-download:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #15803d, #16a34a);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* KLIK */
+.btn-download:active {
+  transform: scale(0.97);
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .table-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .btn-download {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.btn-refresh {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  margin-left: 5px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.btn-refresh:hover {
+  background: #2980b9;
+}
+#progressInfo div {
+  display: grid;
+  grid-template-columns: 130px auto;
+}
