@@ -2,8 +2,8 @@
 const users = [
   { email: "derihanggara86@gmail.com", password: "Embun2017" },
   { email: "anugrah@indosat.com", password: "anugrah2025" },
-  { email: "bayu@indosat.com", password: "bayu123" },
-  { email: "fikri@indosat.com", password: "fikri123" }
+  { email: "fikri@indosat.com", password: "fikri123" },
+  { email: "faisal@indosat.com", password: "faisal123" }
 ];
 
 // ===================== JOB PREFIX MAPPING (DITAMBAHKAN) =====================
