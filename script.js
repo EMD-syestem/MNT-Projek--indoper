@@ -11,7 +11,8 @@ const jobPrefixMapping = {
   "derihanggara86@gmail.com": "JB",
   "anugrah@indosat.com": "JB",
   "bayu@indosat.com": "PSU",
-  "fikri@indosat.com": "RA"
+  "fikri@indosat.com": "RA",
+  "faisal@indosat.com": "JB"
 };
 
 // ✅ Mapping foto untuk user berdasarkan email
@@ -19,7 +20,8 @@ const userPhotos = {
   "derihanggara86@gmail.com": "https://i.postimg.cc/Fzryv9tm/call-center.png",
   "anugrah@indosat.com": "https://i.postimg.cc/cCynBx79/FAFA.jpg",
   "bayu@indosat.com": "https://i.postimg.cc/LXPLG8pc/bayu.jpg",
-  "fikri@indosat.com": "https://i.postimg.cc/JhDkBzGh/fikri.jpg"
+  "fikri@indosat.com": "https://i.postimg.cc/JhDkBzGh/fikri.jpg",
+  "faisal@indosat.com": "https://i.postimg.cc/D0g6H4Dk/FS.jpg"
 };
 
 // ===================== FUNGSI LOGIN =====================
