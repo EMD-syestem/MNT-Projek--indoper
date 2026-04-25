@@ -202,7 +202,11 @@
       <button class="btn" onclick="generateJobNumber()">🔢 Generate Job Number</button>
 
       <strong>No. Pekerjaan:</strong>
-      <span id="jobNumber" style="font-weight: bold; font-size: 1.2em; color: #1e3a8a;">...</span>
+      <span 
+  id="jobNumber" 
+  contenteditable="true"
+  style="font-weight: bold; font-size: 1.2em; color: #1e3a8a; border-bottom: 1px dashed #999; padding: 2px 6px;"
+>...</span>
       <p id="current-date" class="header-date"></p>
     </div>
     <!-- ======= WIZARD STEPS INDICATOR ======= -->
@@ -1587,9 +1591,4 @@
 
 </body>
 
-</html>
-    <script  src="./script.js"></script>
-
-  </body>
-  
 </html>
