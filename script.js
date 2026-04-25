@@ -2,8 +2,9 @@
 const users = [
   { email: "derihanggara86@gmail.com", password: "Embun2017" },
   { email: "anugrah@indosat.com", password: "anugrah2025" },
+  { email: "bayu@indosat.com", password: "bayu123" },
   { email: "fikri@indosat.com", password: "fikri123" },
-  { email: "faisal@indosat.com", password: "faisal2026" }
+  { email: "faisal@indosat.com", password: "faisal123" }
 ];
 
 // ===================== JOB PREFIX MAPPING (DITAMBAHKAN) =====================
@@ -232,39 +233,39 @@ document.addEventListener("keydown", function (e) {
   }
 });
 
-// ===================== JOB NUMBER =====================
 function generateJobNumber() {
   const currentUser = localStorage.getItem("currentUser");
-  const prefix = localStorage.getItem("currentJobPrefix") || "UNKN"; // 🔥 Tambahan
+  const prefix = localStorage.getItem("currentJobPrefix") || "UNKN";
 
   if (!currentUser) {
     alert("Silakan login terlebih dahulu!");
     return;
   }
 
-  // Key localStorage unik berdasarkan email user
   const key = `lastJobNumber_${currentUser}`;
 
   let last = localStorage.getItem(key);
   if (!last) last = 0;
+
   let next = parseInt(last) + 1;
 
-  // Simpan kembali
+  // simpan nomor terakhir
   localStorage.setItem(key, next);
 
-  // 🔥 Gunakan prefix otomatis
   const formatted = `${prefix} : ${String(next).padStart(3, "0")}`;
+
+  // 🔥 INI YANG KAMU LUPA
   document.getElementById("jobNumber").textContent = formatted;
 
-  // 🕒 Tampilkan tanggal
+  // tanggal
   const currentDate = new Date();
   const formattedDate = currentDate.toLocaleString("id-ID", {
     dateStyle: "short",
     timeStyle: "medium"
   });
+
   document.getElementById("current-date").textContent = formattedDate;
 }
-
 // ===================== FORM HANDLER =====================
 document.addEventListener("DOMContentLoaded", () => {
   const submitBtn = document.querySelector(".submit-btn");
@@ -578,18 +579,47 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Jika ada tombol submit (akhir), pastikan validasi/submit
-  if (submitBtn) {
-    submitBtn.addEventListener("click", (e) => {
-      // kamu bisa taruh validasi form di sini sebelum submit
-      // contoh sederhana:
-      // if (!document.getElementById('user').value) { alert('Isi user'); showSection(0); return; }
-      // kalau valid, simpan / kirim form
-      // document.getElementById('jobForm').submit();
-      console.log("Tombol Save ditekan. Tambahkan logika simpan di sini.");
-    });
-  }
+if (submitBtn) {
+  let isSubmitting = false;
 
+  submitBtn.onclick = async (e) => {
+    e.preventDefault();
+
+    if (isSubmitting) return;
+    isSubmitting = true;
+
+    const jobNumber = document.getElementById("jobNumber").textContent.trim();
+
+    if (!jobNumber || jobNumber === "...") {
+      isSubmitting = false;
+      return;
+    }
+
+    const data = { jobNumber };
+
+    try {
+      await fetch(API_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: JSON.stringify(data),
+      });
+
+      if (typeof uploadPhoto === "function") {
+        await uploadPhoto();
+      }
+
+      // 🔥 tidak ada alert di sini
+
+    } catch (err) {
+      console.error("Gagal menyimpan:", err);
+      // 🔥 tidak ada alert juga
+    } finally {
+      setTimeout(() => {
+        isSubmitting = false;
+      }, 1000);
+    }
+  };
+}
   // Klik pada step indicator untuk langsung lompat ke step tertentu
   if (wizardSteps.length) {
     wizardSteps.forEach((step, idx) => {
