@@ -339,7 +339,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let kendaraanData = {};
 
   const API_URL =
-    "https://script.google.com/macros/s/AKfycbzqXaF0psZg2-IM4M8YFl6vWWrKAOlpXb_IooJFMBqVGi3i-vGPQqiIjprwWoLns_Wk/exec?type=vts";
+    "https://script.google.com/macros/s/AKfycbyb_FKT3APvJ6x3PEY6V2TO9OTwN5qpt1ZlX0BK2-t9jTYoSul0VyC3xqVq-ptBVzoXZQ/exec?type=vts";
 
   fetch(API_URL)
     .then((res) => res.json())
@@ -642,7 +642,7 @@ if (submitBtn) {
 
 /// URL Google Sheet Web App
 const sheetURL =
-  "https://script.google.com/macros/s/AKfycbzqXaF0psZg2-IM4M8YFl6vWWrKAOlpXb_IooJFMBqVGi3i-vGPQqiIjprwWoLns_Wk/exec";
+  "https://script.google.com/macros/s/AKfycbyb_FKT3APvJ6x3PEY6V2TO9OTwN5qpt1ZlX0BK2-t9jTYoSul0VyC3xqVq-ptBVzoXZQ/exec";
 
 // Menyimpan detail pekerjaan per Working Type
 window.workingTypeDetails = {};
@@ -777,7 +777,7 @@ let dataVTSReady = false;
 // ================= LOAD DATA =================
 function loadDataVTS() {
   fetch(
-    "https://script.google.com/macros/s/AKfycbzqXaF0psZg2-IM4M8YFl6vWWrKAOlpXb_IooJFMBqVGi3i-vGPQqiIjprwWoLns_Wk/exec?type=vts"
+    "https://script.google.com/macros/s/AKfycbyb_FKT3APvJ6x3PEY6V2TO9OTwN5qpt1ZlX0BK2-t9jTYoSul0VyC3xqVq-ptBVzoXZQ/exec?type=vts"
   )
     .then((res) => res.json())
     .then((data) => {
@@ -901,7 +901,7 @@ function submitCekRutin() {
   };
 
   fetch(
-    "https://script.google.com/macros/s/AKfycbzqXaF0psZg2-IM4M8YFl6vWWrKAOlpXb_IooJFMBqVGi3i-vGPQqiIjprwWoLns_Wk/exec",
+    "https://script.google.com/macros/s/AKfycbyb_FKT3APvJ6x3PEY6V2TO9OTwN5qpt1ZlX0BK2-t9jTYoSul0VyC3xqVq-ptBVzoXZQ/exec",
     {
       method: "POST",
       body: JSON.stringify(data)
@@ -957,7 +957,7 @@ function loadCekRutinReport() {
   document.getElementById("reportCekRutinSection").style.display = "block";
 
   fetch(
-    "https://script.google.com/macros/s/AKfycbzqXaF0psZg2-IM4M8YFl6vWWrKAOlpXb_IooJFMBqVGi3i-vGPQqiIjprwWoLns_Wk/exec?type=cek_rutin"
+    "https://script.google.com/macros/s/AKfycbyb_FKT3APvJ6x3PEY6V2TO9OTwN5qpt1ZlX0BK2-t9jTYoSul0VyC3xqVq-ptBVzoXZQ/exec?type=cek_rutin"
   )
     .then((res) => res.json())
     .then((data) => {
@@ -1026,7 +1026,7 @@ function loadDashboardMaintenance() {
   const selectedJob = document.getElementById("filterJob").value;
 
   fetch(
-    "https://script.google.com/macros/s/AKfycbzqXaF0psZg2-IM4M8YFl6vWWrKAOlpXb_IooJFMBqVGi3i-vGPQqiIjprwWoLns_Wk/exec"
+    "https://script.google.com/macros/s/AKfycbyb_FKT3APvJ6x3PEY6V2TO9OTwN5qpt1ZlX0BK2-t9jTYoSul0VyC3xqVq-ptBVzoXZQ/exec"
   )
     .then((res) => res.text())
     .then((text) => {
@@ -1335,7 +1335,7 @@ loadWorkingTypeNotification();
 // ===================== KIRIM KE GOOGLE SHEET =====================
 async function sendToGoogleSheet(formData) {
   const scriptURL =
-    "https://script.google.com/macros/s/AKfycbzqXaF0psZg2-IM4M8YFl6vWWrKAOlpXb_IooJFMBqVGi3i-vGPQqiIjprwWoLns_Wk/exec";
+    "https://script.google.com/macros/s/AKfycbyb_FKT3APvJ6x3PEY6V2TO9OTwN5qpt1ZlX0BK2-t9jTYoSul0VyC3xqVq-ptBVzoXZQ/exec";
 
   const loader = document.getElementById("loaderOverlay");
   loader.style.display = "flex";
@@ -2250,7 +2250,7 @@ async function loadReport() {
 
   try {
     const scriptURL =
-      "https://script.google.com/macros/s/AKfycbzqXaF0psZg2-IM4M8YFl6vWWrKAOlpXb_IooJFMBqVGi3i-vGPQqiIjprwWoLns_Wk/exec";
+      "https://script.google.com/macros/s/AKfycbyb_FKT3APvJ6x3PEY6V2TO9OTwN5qpt1ZlX0BK2-t9jTYoSul0VyC3xqVq-ptBVzoXZQ/exec";
     const response = await fetch(scriptURL);
 
     if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
@@ -2630,7 +2630,7 @@ async function loadPhotoReport() {
 
   try {
     const scriptURL =
-      "https://script.google.com/macros/s/AKfycbzqXaF0psZg2-IM4M8YFl6vWWrKAOlpXb_IooJFMBqVGi3i-vGPQqiIjprwWoLns_Wk/exec";
+      "https://script.google.com/macros/s/AKfycbyb_FKT3APvJ6x3PEY6V2TO9OTwN5qpt1ZlX0BK2-t9jTYoSul0VyC3xqVq-ptBVzoXZQ/exec";
 
     console.log("📡 Fetching data from:", scriptURL);
     const response = await fetch(scriptURL);
