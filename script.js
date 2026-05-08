@@ -1,117 +1,604 @@
-/// ===================== LOGIN SECTION =====================
-const users = [
-  { email: "derihanggara86@gmail.com", password: "Embun2017" },
-  { email: "anugrah@indosat.com", password: "anugrah2025" },
-  { email: "bayu@indosat.com", password: "bayu123" },
-  { email: "fikri@indosat.com", password: "fikri123" },
-  { email: "faisal@indosat.com", password: "faisal2026" }
-];
+/// ===================== LOGIN SECTION (GOOGLE SHEET) =====================
+const SHEET_API =
+  "https://script.google.com/macros/s/AKfycbyi4bRXw8q-9ggnvPNr89HrhYTGfU4YdioAD5HTr0NwNbM0f8PktjQWecyQQt-9xl90Sg/exec";
 
-// ===================== JOB PREFIX MAPPING (DITAMBAHKAN) =====================
-const jobPrefixMapping = {
-  "derihanggara86@gmail.com": "JB",
-  "anugrah@indosat.com": "JB",
-  "bayu@indosat.com": "PSU",
-  "fikri@indosat.com": "RA",
-  "faisal@indosat.com": "JB"
-};
+let users = [];
+let onlineInterval = null;
+let currentChatUser = null;
+let chatInterval = null;
 
-// ✅ Mapping foto untuk user berdasarkan email
-const userPhotos = {
-  "derihanggara86@gmail.com": "https://i.postimg.cc/Fzryv9tm/call-center.png",
-  "anugrah@indosat.com": "https://i.postimg.cc/cCynBx79/FAFA.jpg",
-  "bayu@indosat.com": "https://i.postimg.cc/LXPLG8pc/bayu.jpg",
-  "fikri@indosat.com": "https://i.postimg.cc/JhDkBzGh/fikri.jpg",
-  "faisal@indosat.com": "https://i.postimg.cc/D0g6H4Dk/FS.jpg"
-};
+/* chat yang sedang dibuka */
+let openedChatEmail = null;
 
-// ===================== FUNGSI LOGIN =====================
+// ===================== LOAD USER =====================
+async function loadUsers() {
+  try {
+    const res = await fetch(SHEET_API);
+    users = await res.json();
+    console.log("Users loaded:", users);
+  } catch (err) {
+    console.error("Gagal load user:", err);
+  }
+}
+// ===================== UPDATE STATUS =====================
+async function updateUserStatus(email, status, note = "") {
+  try {
+    await fetch(
+      `${SHEET_API}?type=status&email=${encodeURIComponent(
+        email
+      )}&status=${encodeURIComponent(status)}&note=${encodeURIComponent(note)}`
+    );
+  } catch (err) {
+    console.error("Update status gagal:", err);
+  }
+}
+
+// ===================== LOAD ONLINE USERS =====================
+async function loadOnlineUsers() {
+  try {
+    window.userCallback = function (data) {
+      const online = data.filter(
+        (x) => String(x.Status || "").toLowerCase() === "online"
+      );
+
+      const onlineUsersBox = document.getElementById("onlineUsers");
+
+      const onlineCount = document.getElementById("onlineCount");
+
+      if (!onlineUsersBox || !onlineCount) return;
+
+      // update jumlah online
+      onlineCount.textContent = online.length;
+
+      // cek apakah chat yg sedang dibuka masih online
+      if (openedChatEmail) {
+        const stillOnline = online.some((x) => x.Email === openedChatEmail);
+
+        // kalau user yg diajak chat offline → tutup chat
+        if (!stillOnline) {
+          closeChat(openedChatEmail);
+        }
+      }
+
+      // ==================================================
+      // JANGAN render ulang kalau chat sedang dibuka
+      // supaya textbox tidak hilang focus
+      // ==================================================
+     if (!openedChatEmail) {
+
+  const me = (localStorage.getItem("currentUser") || "").toLowerCase();
+
+  onlineUsersBox.innerHTML = online.map(user => {
+
+    const isMe =
+      String(user.Email || "").toLowerCase() === me;
+
+    const lastChat = (user.Chat || "")
+      .split("\n")
+      .slice(-1)[0]
+      .replace(/\[.*?\]\s*/, "");
+
+    return `
+      <div class="online-wrap">
+
+        <div
+          class="online-user ${isMe ? 'clickable' : 'disabled'}"
+          ${isMe ? `onclick="openChat('${user.Email}','${user.Nama}')"` : ""}
+        >
+          <img src="${
+            user.Foto ||
+            "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+          }">
+
+          <div class="online-user-info">
+
+            <div class="online-user-name">
+              ${user.Nama || "-"}
+            </div>
+
+            <div class="online-user-loc">
+              ${user.Lokasi || "-"}
+            </div>
+
+            <div class="online-user-chat">
+              ${lastChat}
+            </div>
+
+          </div>
+
+          <div class="online-dot"></div>
+        </div>
+
+        <div id="chat-${user.Email}" class="inline-chat hidden"></div>
+
+      </div>
+    `;
+  }).join("");
+}
+
+      // ==================================================
+// kalau chat sedang dibuka, update count saja
+// tidak redraw DOM
+// ==================================================
+if (openedChatEmail) {
+  const activeUser = online.find(
+    (x) => x.Email === openedChatEmail
+  );
+
+  if (activeUser) {
+    const chatBox = document.getElementById(
+      "chat-" + activeUser.Email
+    );
+
+    // kalau DOM chat belum ada → buat ulang
+    if (!chatBox) {
+
+      const me = (localStorage.getItem("currentUser") || "").toLowerCase();
+
+      onlineUsersBox.innerHTML = online.map(user => {
+
+        const isMe =
+          String(user.Email || "").toLowerCase() === me;
+
+        const lastChat = (user.Chat || "")
+          .split("\n")
+          .slice(-1)[0]
+          .replace(/\[.*?\]\s*/, "");
+
+        return `
+          <div class="online-wrap">
+
+            <div
+              class="online-user ${isMe ? 'clickable' : 'disabled'}"
+              ${isMe ? `onclick="openChat('${user.Email}','${user.Nama}')"` : ""}
+            >
+              <img src="${
+                user.Foto ||
+                "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+              }">
+
+              <div class="online-user-info">
+
+                <div class="online-user-name">
+                  ${user.Nama || "-"}
+                </div>
+
+                <div class="online-user-loc">
+                  ${user.Lokasi || "-"}
+                </div>
+
+                <div class="online-user-chat">
+                  ${lastChat}
+                </div>
+
+              </div>
+
+              <div class="online-dot"></div>
+            </div>
+
+            <div id="chat-${user.Email}" class="inline-chat hidden"></div>
+
+          </div>
+        `;
+      }).join("");
+
+      openChat(
+        activeUser.Email,
+        activeUser.Nama,
+        true
+      );
+    }
+  }
+}
+    };
+
+    const old = document.getElementById("userJsonp");
+
+    if (old) old.remove();
+
+    const script = document.createElement("script");
+
+    script.id = "userJsonp";
+
+    script.src = `${SHEET_API}?callback=userCallback&t=${Date.now()}`;
+
+    document.body.appendChild(script);
+  } catch (err) {
+    console.error("Load online user gagal:", err);
+  }
+}
+// ===================== OPEN CHAT =====================
+function openChat(email, nama, reopen = false) {
+  // jika klik user yg sama, skip
+  if (!reopen && openedChatEmail === email) return;
+
+  openedChatEmail = email;
+  currentChatUser = email;
+
+  // tutup panel lain TANPA hapus isi
+  document.querySelectorAll(".inline-chat").forEach((el) => {
+    if (el.id !== "chat-" + email) {
+      el.classList.add("hidden");
+    }
+  });
+
+  const chatBox = document.getElementById("chat-" + email);
+  if (!chatBox) return;
+
+  chatBox.classList.remove("hidden");
+
+  // hanya buat UI kalau belum ada
+  if (!chatBox.innerHTML.trim()) {
+    chatBox.innerHTML = `
+      <div class="inline-chat-header">
+        <span>💬 ${nama}</span>
+
+        <button onclick="closeChat('${email}')">
+          ✖
+        </button>
+      </div>
+
+      <div id="chatBox-${email}" class="inline-chat-box">
+        <div class="chat-messages"></div>
+
+        <!-- TEXTAREA INPUT -->
+        <textarea
+          id="chatInput-${email}"
+          class="chat-textarea"
+          placeholder="Ketik pesan..."
+          onkeydown="
+            if(event.key === 'Enter' && !event.shiftKey){
+              event.preventDefault();
+              sendChat('${email}');
+            }
+          "
+        ></textarea>
+      </div>
+
+      <!-- BUTTON PANEL -->
+      <div class="inline-chat-input">
+
+        <button onclick="sendChat('${email}')">
+          Kirim
+        </button>
+
+        <button onclick="closeChat('${email}')">
+          Batal
+        </button>
+
+        <button onclick="clearChat('${email}')">
+          Hapus
+        </button>
+
+      </div>
+    `;
+  }
+
+  // fokus ke textarea
+  setTimeout(() => {
+    const input = document.getElementById("chatInput-" + email);
+    if (input) input.focus();
+  }, 100);
+
+  // load chat
+  loadChat();
+
+  // auto refresh
+  if (chatInterval) clearInterval(chatInterval);
+
+  chatInterval = setInterval(loadChat, 3000);
+}
+// ===================== CLOSE CHAT =====================
+function closeChat(email) {
+  openedChatEmail = null;
+  currentChatUser = null;
+
+  const box = document.getElementById("chat-" + email);
+
+  if (box) {
+    box.classList.add("hidden");
+    box.innerHTML = "";
+  }
+
+  if (chatInterval) {
+    clearInterval(chatInterval);
+    chatInterval = null;
+  }
+}
+
+// ===================== LOAD CHAT =====================
+async function loadChatFeed() {
+  window.feedCallback = function (data) {
+    renderFeed(data);
+  };
+
+  const old = document.getElementById("feedJsonp");
+  if (old) old.remove();
+
+  const script = document.createElement("script");
+  script.id = "feedJsonp";
+  script.src = `${SHEET_API}?type=feed&callback=feedCallback&t=${Date.now()}`;
+  document.body.appendChild(script);
+}
+// ===================== SEND CHAT =====================
+async function sendChat(email = currentChatUser) {
+  if (!email) return;
+
+  const input = document.getElementById("chatInput-" + email);
+
+  if (!input) return;
+
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  const from = localStorage.getItem("currentUser").toLowerCase();
+
+  try {
+    const oldScript = document.getElementById("sendJsonp");
+
+    if (oldScript) oldScript.remove();
+
+    window.sendCallback = function (res) {
+      console.log("Chat terkirim:", res);
+
+      input.value = "";
+      loadChat();
+      input.focus();
+    };
+
+    const script = document.createElement("script");
+
+    script.id = "sendJsonp";
+
+    script.src =
+      `${SHEET_API}?type=sendChat` +
+      `&from=${encodeURIComponent(from)}` +
+      `&to=${encodeURIComponent(email)}` +
+      `&message=${encodeURIComponent(msg)}` +
+      `&callback=sendCallback` +
+      `&t=${Date.now()}`;
+
+    document.body.appendChild(script);
+  } catch (err) {
+    console.error("Send chat gagal:", err);
+  }
+}
+
+function loadChat() {
+  console.log("reload chat...");
+  // ambil ulang data chat dari server / sheet
+}
+// ===================== RENDER CHAT =====================
+function renderChat(data) {
+  const me = localStorage.getItem("currentUser");
+
+  if (!currentChatUser) return;
+
+  const filtered = data.filter(
+    (x) =>
+      (String(x.From).trim() === me &&
+        String(x.To).trim() === currentChatUser) ||
+      (String(x.From).trim() === currentChatUser && String(x.To).trim() === me)
+  );
+
+  const chatBox = document.getElementById("chatBox-" + currentChatUser);
+
+  if (!chatBox) return;
+
+  chatBox.innerHTML = filtered
+    .map(
+      (msg) => `
+    <div class="chat-item ${String(msg.From).trim() === me ? "me" : ""}">
+      ${msg.Message}
+    </div>
+  `
+    )
+    .join("");
+
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+// ===================== SHOW DASHBOARD =====================
+async function showDashboard(user) {
+  document.getElementById("loginPage").style.display = "none";
+  document.querySelector("header").style.display = "flex";
+  document.querySelector("main").style.display = "block";
+
+  // tanggal
+  const now = new Date();
+  document.getElementById("current-date").textContent = now.toLocaleDateString(
+    "id-ID",
+    {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    }
+  );
+
+  // foto + nama
+  const userInfoImg = document.querySelector(".user-info img");
+  const userInfoText = document.querySelector(".user-info span");
+
+  userInfoImg.src =
+    user.Foto || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+  userInfoText.textContent = user.Nama || user.Email.split("@")[0];
+
+  // load dashboard
+  showDashboardMaintenance();
+
+  // load user online
+  await loadOnlineUsers();
+
+  if (!onlineInterval) {
+    onlineInterval = setInterval(loadOnlineUsers, 5000);
+  }
+}
+function renderFeed(data) {
+  const onlineUsersBox = document.getElementById("onlineUsers");
+
+  if (!onlineUsersBox) return;
+
+  let html = "";
+
+  data
+    .slice(-20)
+    .reverse()
+    .forEach((item) => {
+      const user = users.find(
+        (u) => String(u.Email).toLowerCase() === String(item.from).toLowerCase()
+      );
+
+      const foto =
+        user?.Foto || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+      html += `
+      <div class="feed-item">
+        <img src="${foto}" class="feed-avatar">
+
+        <div class="feed-text">
+          <b>${item.from}</b><br>
+          ${item.message}
+        </div>
+      </div>
+    `;
+    });
+
+  onlineUsersBox.innerHTML = html;
+}
+
+// ===================== SHOW LOGIN =====================
+function showLoginPage() {
+  document.querySelector("header").style.display = "none";
+  document.querySelector("main").style.display = "none";
+  document.getElementById("loginPage").style.display = "flex";
+}
+
+// ===================== LOGIN =====================
 async function login() {
   const email = document.getElementById("loginEmail").value.trim();
   const pass = document.getElementById("loginPassword").value.trim();
   const err = document.getElementById("loginError");
 
-  // ✅ Tampilkan Loader
   showLoader();
 
-  // Simulasi proses login
-  setTimeout(() => {
-    const user = users.find((u) => u.email === email && u.password === pass);
-    if (user) {
-      err.textContent = "";
-
-      // ✅ Simpan user yang login di localStorage
-      localStorage.setItem("currentUser", user.email);
-
-      // ===================== SIMPAN JOB PREFIX OTOMATIS (DITAMBAHKAN) =====================
-      const prefix = jobPrefixMapping[user.email] || "UNKN";
-      localStorage.setItem("currentJobPrefix", prefix);
-      console.log("Prefix Login:", prefix);
-
-      // ===================== Tampilkan dashboard, sembunyikan login page
-      document.getElementById("loginPage").style.display = "none";
-      document.querySelector("header").style.display = "flex";
-      document.querySelector("main").style.display = "block";
-
-      // ===================== Tampilkan tanggal hari ini
-      const now = new Date();
-      document.getElementById(
-        "current-date"
-      ).textContent = now.toLocaleDateString("id-ID", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric"
-      });
-
-      // ===================== Tampilkan foto & nama user
-      const userInfoImg = document.querySelector(".user-info img");
-      const userInfoText = document.querySelector(".user-info span");
-      const photoURL =
-        userPhotos[user.email] ||
-        "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-
-      userInfoImg.src = photoURL;
-      userInfoText.textContent = user.email.split("@")[0];
-    } else {
-      err.textContent = "❌ Email atau password salah!";
+  try {
+    if (!users.length) {
+      await loadUsers();
     }
 
-    // ⛔ Sembunyikan loader setelah selesai
-    hideLoader();
-  }, 1200);
+    const user = users.find(
+      (u) =>
+        String(u.Email).trim() === email && String(u.Password).trim() === pass
+    );
+
+    if (!user) {
+      err.textContent = "❌ Email atau password salah!";
+      hideLoader();
+      return;
+    }
+
+    err.textContent = "";
+
+    localStorage.setItem("currentUser", user.Email);
+    localStorage.setItem("currentJobPrefix", user.Lokasi || "UNKN");
+
+    await updateUserStatus(user.Email, "Online", "Login");
+
+    await showDashboard(user);
+  } catch (error) {
+    console.error(error);
+    err.textContent = "❌ Gagal login";
+  }
+
+  hideLoader();
 }
 
-function logout() {
-  showLoader(); // ✅ Tampilkan loader saat logout
+// ===================== TAMPILAN AWAL =====================
+window.addEventListener("DOMContentLoaded", async () => {
+  showLoginPage();
 
-  setTimeout(() => {
-    // Tampilkan halaman login
-    document.getElementById("loginPage").style.display = "flex";
+  await loadUsers();
 
-    // Sembunyikan halaman utama
-    document.querySelector("header").style.display = "none";
-    document.querySelector("main").style.display = "none";
+  const savedUser = localStorage.getItem("currentUser");
 
-    // Sembunyikan semua report
-    document.getElementById("reportSection").style.display = "none";
-    document.getElementById("photoReportSection").style.display = "none"; // ✅ FIX UTAMA
+  if (!savedUser) return;
 
-    // Reset input login
-    document.getElementById("loginEmail").value = "";
-    document.getElementById("loginPassword").value = "";
+  const user = users.find((u) => String(u.Email).trim() === savedUser);
 
-    // Hapus user aktif
+  if (!user) {
     localStorage.removeItem("currentUser");
-    localStorage.removeItem("currentJobPrefix"); // 🔥 Tambahan wajib
+    localStorage.removeItem("currentJobPrefix");
+    return;
+  }
 
-    // Kosongkan job number
-    document.getElementById("jobNumber").textContent = "";
+  await updateUserStatus(savedUser, "Online", "Auto Login");
 
-    hideLoader(); // Sembunyikan loader
-  }, 1000);
+  await showDashboard(user);
+});
+
+// ===================== TAB DITUTUP =====================
+window.addEventListener("beforeunload", async () => {
+  const currentUser = localStorage.getItem("currentUser");
+
+  if (currentUser) {
+    await updateUserStatus(currentUser, "Offline", "Logout");
+  }
+});
+async function logout() {
+  showLoader();
+
+  const currentUser = localStorage.getItem("currentUser");
+
+  try {
+    // update status ke Google Sheet
+    if (currentUser) {
+      await updateUserStatus(currentUser, "Offline", "Logout");
+    }
+
+    // stop refresh user online
+    if (onlineInterval) {
+      clearInterval(onlineInterval);
+      onlineInterval = null;
+    }
+
+    // tutup chat kalau terbuka
+    const chatPanel = document.getElementById("chatPanel");
+    if (chatPanel) {
+      chatPanel.classList.add("hidden");
+    }
+
+    setTimeout(() => {
+      // tampilkan login
+      document.getElementById("loginPage").style.display = "flex";
+
+      // sembunyikan dashboard
+      document.querySelector("header").style.display = "none";
+      document.querySelector("main").style.display = "none";
+
+      // sembunyikan report
+      document.getElementById("reportSection").style.display = "none";
+      document.getElementById("photoReportSection").style.display = "none";
+
+      // reset form login
+      document.getElementById("loginEmail").value = "";
+      document.getElementById("loginPassword").value = "";
+
+      // hapus session
+      localStorage.removeItem("currentUser");
+      localStorage.removeItem("currentJobPrefix");
+
+      // reset job number
+      const jobNumber = document.getElementById("jobNumber");
+      if (jobNumber) jobNumber.textContent = "";
+
+      hideLoader();
+    }, 700);
+  } catch (err) {
+    console.error("Logout gagal:", err);
+    hideLoader();
+  }
 }
-
 // ===================== TOGGLE PASSWORD =====================
 const togglePassword = document.getElementById("togglePassword");
 const passwordInput = document.getElementById("loginPassword");
@@ -143,32 +630,54 @@ document.getElementById(
 });
 
 // ===================== ATURAN TAMPILAN AWAL =====================
-window.addEventListener("DOMContentLoaded", () => {
-  // Saat halaman pertama kali dibuka, tampilkan hanya login page
+window.addEventListener("DOMContentLoaded", async () => {
   document.querySelector("header").style.display = "none";
   document.querySelector("main").style.display = "none";
   document.getElementById("loginPage").style.display = "flex";
 
-  // Jika sebelumnya user sudah login (session tersimpan)
+  // ambil user dari sheet
+  await loadUsers();
+
+  // cek session login
   const savedUser = localStorage.getItem("currentUser");
-  const savedPrefix = localStorage.getItem("currentJobPrefix"); // 🔥 Tambahan
+  const savedPrefix = localStorage.getItem("currentJobPrefix");
 
-  if (savedUser) {
-    document.getElementById("loginPage").style.display = "none";
-    document.querySelector("header").style.display = "flex";
-    document.querySelector("main").style.display = "block";
+  if (!savedUser) return;
 
-    const userInfoImg = document.querySelector(".user-info img");
-    const userInfoText = document.querySelector(".user-info span");
-    const photoURL =
-      userPhotos[savedUser] ||
-      "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+  // cari user di database sheet
+  const user = users.find((u) => String(u.Email).trim() === savedUser);
 
-    userInfoImg.src = photoURL;
-    userInfoText.textContent = savedUser.split("@")[0];
-
-    console.log("Prefix Auto-Login:", savedPrefix);
+  if (!user) {
+    localStorage.removeItem("currentUser");
+    localStorage.removeItem("currentJobPrefix");
+    return;
   }
+
+  // tampilkan dashboard
+  document.getElementById("loginPage").style.display = "none";
+  document.querySelector("header").style.display = "flex";
+  document.querySelector("main").style.display = "block";
+
+  // foto user
+  const userInfoImg = document.querySelector(".user-info img");
+  userInfoImg.src =
+    user.Foto || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+  // nama user
+  const userInfoText = document.querySelector(".user-info span");
+  userInfoText.textContent = user.Nama || savedUser.split("@")[0];
+
+  // update status online lagi
+  await updateUserStatus(savedUser, "Online", "Auto Login");
+
+  // tampilkan dashboard
+  showDashboardMaintenance();
+
+  // load user online
+  loadOnlineUsers();
+  setInterval(loadOnlineUsers, 5000);
+
+  console.log("Prefix Auto Login:", savedPrefix);
 });
 
 // ===================== PANEL MENU =====================
@@ -268,209 +777,406 @@ function generateJobNumber() {
 }
 // ===================== FORM HANDLER =====================
 document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("jobForm");
   const submitBtn = document.querySelector(".submit-btn");
-  if (!submitBtn) return;
 
-  submitBtn.addEventListener("click", async function () {
-    const fileInput = document.querySelector("input[type='file']");
-    let fotoUrl = "";
+  if (!form || !submitBtn) return;
 
-    // === Upload foto ke base64 ===
-    if (fileInput && fileInput.files.length > 0) {
-      const file = fileInput.files[0];
-      const reader = new FileReader();
-      fotoUrl = await new Promise((resolve) => {
-        reader.onload = () => resolve(reader.result);
-        reader.readAsDataURL(file);
+  let sending = false;
+
+  submitBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+
+    // cegah double submit
+    if (sending) return;
+    sending = true;
+    submitBtn.disabled = true;
+
+    try {
+      const fileInput = document.querySelector("input[type='file']");
+      let fotoUrl = "";
+
+      // =========================
+      // CONVERT FOTO -> BASE64
+      // =========================
+      if (fileInput && fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+
+        fotoUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+
+          reader.readAsDataURL(file);
+        });
+      }
+
+      // =========================
+      // TANGGAL
+      // =========================
+      const tanggalSekarang = new Date().toLocaleString("id-ID", {
+        dateStyle: "short",
+        timeStyle: "medium"
       });
+
+      // =========================
+      // FORM DATA
+      // =========================
+      const formData = {
+        "Job Number": document.getElementById("jobNumber")?.textContent || "",
+        "Tanggal": tanggalSekarang,
+        "User name": document.getElementById("user")?.value || "",
+        "working type": document.getElementById("workingType")?.value || "",
+        "installation type": document.getElementById("installationType")?.value || "",
+        "Merk kendaraan": document.getElementById("merkKendaraan")?.value || "",
+        "Vehicle type": document.getElementById("vehicleType")?.value || "",
+        "Lisence plate": document.getElementById("licensePlate")?.value || "",
+        "Vehicle id": document.getElementById("vehicleId")?.value || "",
+        "Department": document.getElementById("department")?.value || "",
+        "Colour": document.getElementById("colour")?.value || "",
+        "Location": document.getElementById("location")?.value || "",
+        "GPS Serial No": document.getElementById("gpsSerial")?.value || "",
+        "GPS Unit ID": document.getElementById("gpsUnitId")?.value || "",
+        "GSM": document.getElementById("gsm")?.value || "",
+        "Distance": document.getElementById("distance")?.value || "",
+        "GPS Unit Module": getStatus("gps"),
+        "RFID Reader": getStatus("rfid"),
+        "Buzzer": getStatus("buzzer"),
+        "Stater interupter": getStatus("starter"),
+        "Fuel stick": getStatus("fuel"),
+        "Mesin": getStatus("d-mesin"),
+        "Panel Dasbord": getStatus("d-paneldashboard"),
+        "Klakson": getStatus("d-klakson"),
+        "Audio": getStatus("d-audio"),
+        "Sistem listrik": getStatus("d-listrik"),
+        "AC": getStatus("d-ac"),
+        "Power windows": getStatus("d-powerwindows"),
+        "Panel Instrument": getStatus("d-panelinstrument"),
+        "Spion": getStatus("d-spion"),
+        "Deskripsi Pekerjaan":
+          document.getElementById("deskripsiPekerjaan")?.value || "",
+        "Progres Status":
+          document.getElementById("progressStatus")?.value || "",
+        "Upload foto Bukti": fotoUrl
+      };
+
+      console.log("📤 Mengirim:", formData);
+
+      await sendToGoogleSheet(formData);
+
+      console.log("✅ sukses simpan");
+
+      if (typeof generateJobNumber === "function") {
+        generateJobNumber();
+      }
+
+    } catch (err) {
+      console.error("❌ Gagal simpan:", err);
+      alert("❌ Gagal kirim data");
+    } finally {
+      sending = false;
+      submitBtn.disabled = false;
     }
-
-    // === Dapatkan tanggal terbaru ===
-    const tanggalSekarang = new Date().toLocaleString("id-ID", {
-      dateStyle: "short",
-      timeStyle: "medium"
-    });
-
-    // === Kumpulkan semua data form ===
-    const formData = {
-      "Job Number": document.getElementById("jobNumber").textContent,
-      Tanggal: tanggalSekarang, // ✅ DITAMBAHKAN DI SINI
-      "User name": document.getElementById("user").value,
-      "working type": document.getElementById("workingType").value,
-      "installation type": document.getElementById("installationType").value,
-      "Merk kendaraan": document.getElementById("merkKendaraan").value,
-      "Vehicle type": document.getElementById("vehicleType").value,
-      "Lisence plate": document.getElementById("licensePlate").value,
-      "Vehicle id": document.getElementById("vehicleId").value,
-      Department: document.getElementById("department").value,
-      Colour: document.getElementById("colour").value,
-      Location: document.getElementById("location").value,
-      "GPS Serial No": document.getElementById("gpsSerial").value,
-      "GPS Unit ID": document.getElementById("gpsUnitId").value,
-      GSM: document.getElementById("gsm").value,
-      Distance: document.getElementById("distance").value,
-      "GPS Unit Module": getStatus("gps"),
-      "RFID Reader": getStatus("rfid"),
-      Buzzer: getStatus("buzzer"),
-      "Stater interupter": getStatus("starter"),
-      "Fuel stick": getStatus("fuel"),
-      Mesin: getStatus("d-mesin"),
-      "Panel Dasbord": getStatus("d-paneldashboard"),
-      Klakson: getStatus("d-klakson"),
-      Audio: getStatus("d-audio"),
-      "Sistem listrik": getStatus("d-listrik"),
-      AC: getStatus("d-ac"),
-      "Power windows": getStatus("d-powerwindows"),
-      "Panel Instrument": getStatus("d-panelinstrument"),
-      Spion: getStatus("d-spion"),
-      "Deskripsi Pekerjaan": document.getElementById("deskripsiPekerjaan")
-        .value,
-      "Progres Status": document.getElementById("progressStatus").value,
-      "Upload foto Bukti": fotoUrl
-    };
-
-    console.log("📤 Mengirim:", formData);
-    await sendToGoogleSheet(formData);
-    generateJobNumber();
   });
 });
-
 document.addEventListener("DOMContentLoaded", function () {
   let kendaraanData = {};
 
-  const API_URL =
-    "https://script.google.com/macros/s/AKfycbyb_FKT3APvJ6x3PEY6V2TO9OTwN5qpt1ZlX0BK2-t9jTYoSul0VyC3xqVq-ptBVzoXZQ/exec?type=vts";
+  const API_URLS = [
+    "https://script.google.com/macros/s/AKfycbzdMdw6ZNMoj1IimADGcl2mVf0WHCgx9dBOys5BFPfMt4th8NmsuLlbO2DeZYV1aaPxRQ/exec?type=vts",
+    "https://script.google.com/macros/s/AKfycbx2qYSANHLW5_rwBnoEf6W1bUVNPc3q1QFi8QqeeC7Ve_ubCZcRl7Z1rQEbLzaxkB4l/exec?sheet=Informasi%20VTS",
+    "https://script.google.com/macros/s/AKfycbwEWKwgvMaoYVYWyThk3L5_qU7xTI4pfjTxc4pOvhhlF9gldFEvDg4tc1whiNhxO9tEpA/exec?sheet=Informasi%20VTS"
+  ];
 
-  fetch(API_URL)
-    .then((res) => res.json())
-    .then((data) => {
-      console.log("DATA FULL:", data);
+  Promise.all(
+    API_URLS.map((url) =>
+      fetch(url)
+        .then((r) => r.json())
+        .then((res) => {
+          if (Array.isArray(res)) return res;
+          if (Array.isArray(res.data)) return res.data;
+          if (Array.isArray(res.result)) return res.result;
+          if (Array.isArray(res.values)) return res.values;
+          if (Array.isArray(res.records)) return res.records;
+          return [];
+        })
+        .catch((err) => {
+          console.error(err);
+          return [];
+        })
+    )
+  ).then((results) => {
+    const data = results.flat();
 
-      const select = document.getElementById("vehicleId");
-      select.innerHTML = '<option value="">-- Pilih Kendaraan --</option>';
+    const select = document.getElementById("vehicleId");
+    select.innerHTML = '<option value="">-- Pilih Vehicle ID --</option>';
 
-      data.forEach((row) => {
-        let node, plate, jenis, imei, imsi;
+    data.forEach((row) => {
+      let node = "";
+      let plate = "";
+      let jenis = "";
+      let imei = "";
+      let imsi = "";
 
-        if (Array.isArray(row)) {
-          node = row[1];
-          plate = row[2];
-          jenis = row[3];
-          imei = row[4];
-          imsi = row[5];
-        } else {
-          node = row.Node || row.node;
-          plate = row["License Plate"] || row.license_plate;
-          jenis = row["Jenis kendaraan"] || row.jenis_kendaraan;
-          imei = row.IMEI || row.imei;
-          imsi = row.IMSI || row.imsi;
-        }
+      // ARRAY
+      if (Array.isArray(row)) {
+        node = row[1] || "";
+        plate = row[2] || "";
+        jenis = row[3] || "";
+        imei = row[4] || "";
+        imsi = row[5] || "";
+      }
 
-        if (!plate) return;
+      // OBJECT
+      else {
+        node = row.Node || row.node || "";
+        plate = row["License Plate"] || row.plate || "";
+        jenis = row["Jenis kendaraan"] || row["Jenis Kendaraan"] || "";
+        imei = row.IMEI || "";
+        imsi = row.IMSI || "";
+      }
 
-        const key = plate.trim().toUpperCase();
+      if (!plate) return;
 
-        kendaraanData[key] = {
-          merk: jenis || "",
-          type: getType(jenis),
-          plate: plate || "",
-          imei: imei || "",
-          node: node || "",
-          imsi: imsi || ""
-        };
+      const key = plate.trim().toUpperCase();
 
-        // isi dropdown
-        const opt = document.createElement("option");
-        opt.value = key;
-        opt.textContent = plate;
-        select.appendChild(opt);
-      });
+      kendaraanData[key] = {
+        merk: jenis,
+        type: getType(jenis),
+        plate,
+        imei,
+        node,
+        imsi
+      };
 
-      console.log("HASIL:", kendaraanData);
-    })
-    .catch((err) => console.error(err));
+      const opt = document.createElement("option");
+      opt.value = key;
+      opt.textContent = plate;
+      select.appendChild(opt);
+    });
 
-  // ===============================
+    console.log("siap:", kendaraanData);
+  });
+
   function getType(jenis) {
     if (!jenis) return "";
-    jenis = jenis.toLowerCase();
 
-    if (jenis.includes("double")) return "Double cabin";
-    if (jenis.includes("single")) return "Single cabin";
-    if (jenis.includes("pajero")) return "SUV";
-    if (jenis.includes("hino") || jenis.includes("fighter"))
+    const j = jenis.toLowerCase();
+
+    // ROAD ROLLER
+    if (
+      j.includes("roller") ||
+      j.includes("road roller") ||
+      j.includes("compactor")
+    ) {
+      return "Road Roller";
+    }
+
+    // EXCAVATOR
+    if (
+      j.includes("excavator") ||
+      j.includes("hitachi excavator") ||
+      j.includes("pc200") ||
+      j.includes("pc300")
+    ) {
+      return "Excavator";
+    }
+
+    // BACKHOE LOADER
+    if (
+      j.includes("backhoe") ||
+      j.includes("backhoe loader") ||
+      j.includes("komatsu backhoe")
+    ) {
+      return "Picker";
+      // kalau di dropdown Anda tidak ada "Backhoe Loader",
+      // paling dekat pakai Picker
+    }
+
+    // MOTOR GRADER
+    if (j.includes("grader")) {
+      return "Motor Grader";
+    }
+
+    // PICKER
+    if (j.includes("picker")) {
+      return "Picker";
+    }
+
+    // CRANE
+    if (j.includes("crane")) {
+      return "Crane";
+    }
+
+    // LOWBED
+    if (j.includes("lowbed")) {
+      return "Truck Lowbed";
+    }
+
+    // TRONTON
+    if (
+      j.includes("tronton") ||
+      j.includes("truck tronton") ||
+      j.includes("mitsubishi truck tronton") ||
+      j.includes("ud quester") ||
+      j.includes("ud quester truck")
+    ) {
+      return "Truck tronton";
+    }
+
+    // TUG BOAT
+    if (
+      j.includes("tug boat") ||
+      j.includes("arlin") ||
+      j.includes("tug boat arlin")
+    ) {
+      return "Tug Boat Arlin";
+    }
+
+    // SPEED BOAT
+    if (
+      j.includes("speed boat") ||
+      j.includes("speed teluk aru") ||
+      j.includes("psb") ||
+      j.includes("lct") ||
+      j.includes("boat") ||
+      j.includes("speed")
+    ) {
+      return "Speed Boat";
+    }
+
+    // VACUM TRUCK
+    if (j.includes("fighter") || j.includes("hino") || j.includes("hd 125")) {
       return "Vacum truck";
+    }
 
-    return "SUV";
+    // DOUBLE CABIN
+    if (j.includes("triton") || j.includes("double")) {
+      return "Doble cabin";
+    }
+
+    // SINGLE CABIN
+    if (j.includes("single") || j.includes("pickup")) {
+      return "Single cabin";
+    }
+
+    // SUV
+    if (j.includes("pajero") || j.includes("fortuner")) {
+      return "SUV";
+    }
+
+    // MPV
+    if (j.includes("innova") || j.includes("hiace")) {
+      return "MPV";
+    }
+
+    // FIRE TRUCK
+    if (j.includes("pemadam") || j.includes("fire")) {
+      return "Mobil Pemadam";
+    }
+
+    // MOTOR
+    if (j.includes("motor")) {
+      return "MotorCross";
+    }
+
+    return "";
+  }
+  document.getElementById("vehicleId").addEventListener("change", function () {
+    const data = kendaraanData[this.value];
+    if (!data) return;
+
+    setVal("licensePlate", data.plate);
+    setVal("merkKendaraan", data.merk);
+    setVal("vehicleType", data.type);
+    setVal("gpsSerial", data.imei);
+    setVal("gpsUnitId", data.node);
+    setVal("gsm", data.imsi);
+  });
+
+  function normalize(s) {
+    return (s || "")
+      .toString()
+      .trim()
+      .toUpperCase()
+      .replace(/\s+/g, " ")
+      .replace(/[()]/g, "");
   }
 
-  // ===============================
-  document.getElementById("vehicleId").addEventListener("change", function () {
-    const key = this.value;
-    const data = kendaraanData[key];
-
-    console.log("PILIH:", key);
-    console.log("DATA:", data);
-
-    if (data) {
-      console.log("PLATE YANG MAU DITAMPILKAN:", data.plate); // 🔥 DEBUG
-
-      setVal("licensePlate", data.plate);
-      setVal("merkKendaraan", data.merk);
-      setVal("vehicleType", data.type);
-      setVal("gpsSerial", data.imei);
-      setVal("gpsUnitId", data.node);
-      setVal("gsm", data.imsi);
-    }
-  });
-  function normalizePlate(plate) {
-    if (!plate) return "";
-    return plate
-      .replace(/JBI-0+(\d+)/i, "JBI-$1") // 018 → 18
-      .trim()
-      .toUpperCase();
+  // khusus plate JBI
+  function normalizePlate(s) {
+    return (
+      normalize(s)
+        // JBI-063 -> JBI-63
+        .replace(/JBI-0+(\d+)/gi, "JBI-$1")
+        // PHR1-01 -> PHR1-1
+        .replace(/PHR1-0+(\d+)/gi, "PHR1-$1")
+        // hilangkan double space
+        .replace(/\s+/g, " ")
+        .trim()
+    );
   }
 
   function setVal(id, value) {
     const el = document.getElementById(id);
     if (!el) return;
 
-    console.log("SET", id, "=", value);
-
-    // 🔥 KHUSUS licensePlate (SELECT manual)
-    if (id === "licensePlate" && el.tagName === "SELECT") {
-      const target = normalizePlate(value);
-
+    // ================= SELECT =================
+    if (el.tagName === "SELECT") {
       let found = false;
-      for (let i = 0; i < el.options.length; i++) {
-        const optText = normalizePlate(el.options[i].text);
-        if (optText === target) {
-          el.selectedIndex = i;
-          found = true;
-          break;
+
+      // KHUSUS LICENSE PLATE
+      if (id === "licensePlate") {
+        const target = normalizePlate(value);
+
+        for (let i = 0; i < el.options.length; i++) {
+          const txt = normalizePlate(el.options[i].text);
+          const val = normalizePlate(el.options[i].value);
+
+          if (
+            txt === target ||
+            val === target ||
+            txt.includes(target) ||
+            target.includes(txt)
+          ) {
+            el.selectedIndex = i;
+            found = true;
+            break;
+          }
+        }
+      }
+
+      // SELECT BIASA
+      else {
+        const target = normalize(value);
+
+        for (let i = 0; i < el.options.length; i++) {
+          const txt = normalize(el.options[i].text);
+          const val = normalize(el.options[i].value);
+
+          if (
+            txt === target ||
+            val === target ||
+            txt.includes(target) ||
+            target.includes(txt)
+          ) {
+            el.selectedIndex = i;
+            found = true;
+            break;
+          }
         }
       }
 
       if (!found) {
-        console.warn("❌ Plate tidak ditemukan di dropdown:", value);
+        console.warn("tidak ketemu:", id, value);
       }
+
       return;
     }
 
-    // 🔥 SELECT lain (merk, type, dll) → langsung set value
-    if (el.tagName === "SELECT") {
-      el.value = value || "";
-      return;
-    }
-
-    // 🔥 INPUT / TEXTAREA
-    if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
-      el.value = value || "";
-      return;
-    }
-
-    // 🔥 fallback
-    el.textContent = value || "";
+    // ================= INPUT =================
+    el.value = value || "";
   }
 });
 // ===================== HELPER FUNCTION =====================
@@ -579,47 +1285,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-if (submitBtn) {
-  let isSubmitting = false;
-
-  submitBtn.onclick = async (e) => {
-    e.preventDefault();
-
-    if (isSubmitting) return;
-    isSubmitting = true;
-
-    const jobNumber = document.getElementById("jobNumber").textContent.trim();
-
-    if (!jobNumber || jobNumber === "...") {
-      isSubmitting = false;
-      return;
-    }
-
-    const data = { jobNumber };
-
-    try {
-      await fetch(API_URL, {
-        method: "POST",
-        mode: "no-cors",
-        body: JSON.stringify(data),
-      });
-
-      if (typeof uploadPhoto === "function") {
-        await uploadPhoto();
-      }
-
-      // 🔥 tidak ada alert di sini
-
-    } catch (err) {
-      console.error("Gagal menyimpan:", err);
-      // 🔥 tidak ada alert juga
-    } finally {
-      setTimeout(() => {
-        isSubmitting = false;
-      }, 1000);
-    }
-  };
-}
+ 
   // Klik pada step indicator untuk langsung lompat ke step tertentu
   if (wizardSteps.length) {
     wizardSteps.forEach((step, idx) => {
@@ -642,7 +1308,7 @@ if (submitBtn) {
 
 /// URL Google Sheet Web App
 const sheetURL =
-  "https://script.google.com/macros/s/AKfycbyb_FKT3APvJ6x3PEY6V2TO9OTwN5qpt1ZlX0BK2-t9jTYoSul0VyC3xqVq-ptBVzoXZQ/exec";
+  "https://script.google.com/macros/s/AKfycbzdMdw6ZNMoj1IimADGcl2mVf0WHCgx9dBOys5BFPfMt4th8NmsuLlbO2DeZYV1aaPxRQ/exec";
 
 // Menyimpan detail pekerjaan per Working Type
 window.workingTypeDetails = {};
@@ -775,21 +1441,40 @@ let dataVTS = [];
 let dataVTSReady = false;
 
 // ================= LOAD DATA =================
+// ================= LOAD DATA =================
 function loadDataVTS() {
-  fetch(
-    "https://script.google.com/macros/s/AKfycbyb_FKT3APvJ6x3PEY6V2TO9OTwN5qpt1ZlX0BK2-t9jTYoSul0VyC3xqVq-ptBVzoXZQ/exec?type=vts"
-  )
-    .then((res) => res.json())
-    .then((data) => {
-      dataVTS = data;
+  Promise.all([
+    fetch(
+      "https://script.google.com/macros/s/AKfycbzdMdw6ZNMoj1IimADGcl2mVf0WHCgx9dBOys5BFPfMt4th8NmsuLlbO2DeZYV1aaPxRQ/exec?type=vts"
+    ).then((res) => res.json()),
+
+    fetch(
+      "https://script.google.com/macros/s/AKfycbx2qYSANHLW5_rwBnoEf6W1bUVNPc3q1QFi8QqeeC7Ve_ubCZcRl7Z1rQEbLzaxkB4l/exec?sheet=Informasi%20VTS"
+    )
+      .then((res) => res.json())
+      .then((res) => (Array.isArray(res) ? res : res.data || [])),
+
+    fetch(
+      "https://script.google.com/macros/s/AKfycbwEWKwgvMaoYVYWyThk3L5_qU7xTI4pfjTxc4pOvhhlF9gldFEvDg4tc1whiNhxO9tEpA/exec?sheet=Informasi%20VTS"
+    )
+      .then((res) => res.json())
+      .then((res) => (Array.isArray(res) ? res : res.data || []))
+  ])
+    .then(([jambi, rantau, psu]) => {
+      // gabung semua tanpa merubah kode utama
+      dataVTS = [...jambi, ...rantau, ...psu];
+
       dataVTSReady = true;
+
+      console.log("✅ Jambi:", jambi.length);
+      console.log("✅ Rantau:", rantau.length);
+      console.log("✅ PSU:", psu.length);
       console.log("✅ Data VTS siap:", dataVTS);
     })
     .catch((err) => {
       console.error("❌ Gagal ambil data VTS", err);
     });
 }
-
 // ================= NORMALISASI PLAT =================
 function bersihkanPlat(text) {
   return (text || "").toLowerCase().replace(/[^a-z0-9]/g, ""); // hapus semua selain huruf & angka
@@ -845,7 +1530,7 @@ function showVTS() {
 
 function loadVTS() {
   const url =
-    "https://script.google.com/macros/s/AKfycbzqXaF0psZg2-IM4M8YFl6vWWrKAOlpXb_IooJFMBqVGi3i-vGPQqiIjprwWoLns_Wk/exec?type=vts";
+    "https://script.google.com/macros/s/AKfycbzdMdw6ZNMoj1IimADGcl2mVf0WHCgx9dBOys5BFPfMt4th8NmsuLlbO2DeZYV1aaPxRQ/exec?type=vts";
 
   const tbody = document.querySelector("#vtsTable tbody");
   tbody.innerHTML = "<tr><td colspan='7'>Loading...</td></tr>";
@@ -882,6 +1567,126 @@ function loadVTS() {
     });
 }
 
+function loadVTSRantau() {
+  const url =
+    "https://script.google.com/macros/s/AKfycbx2qYSANHLW5_rwBnoEf6W1bUVNPc3q1QFi8QqeeC7Ve_ubCZcRl7Z1rQEbLzaxkB4l/exec?sheet=Informasi%20VTS";
+
+  const tbody = document.querySelector("#vtsTableRantau tbody");
+
+  if (!tbody) {
+    console.error("tbody tidak ditemukan");
+    return;
+  }
+
+  tbody.innerHTML = "<tr><td colspan='7'>Loading...</td></tr>";
+
+  fetch(url)
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error("HTTP " + res.status);
+      }
+      return res.json();
+    })
+    .then((json) => {
+      console.log("DATA VTS RANTAU =", json);
+
+      // ambil array data
+      const data = Array.isArray(json) ? json : json.data || [];
+
+      tbody.innerHTML = "";
+
+      if (!data.length) {
+        tbody.innerHTML = "<tr><td colspan='7'>Data kosong</td></tr>";
+        return;
+      }
+
+      data.forEach((d, i) => {
+        const status = String(d["Status VTS"] || "").toLowerCase();
+
+        let warna = "#ef4444";
+        if (status.includes("active")) warna = "#16a34a";
+
+        const row = `
+          <tr>
+            <td>${d["No"] || i + 1}</td>
+            <td>${d["Node"] || "-"}</td>
+            <td>${d["License Plate"] || "-"}</td>
+            <td>${d["Jenis kendaraan"] || "-"}</td>
+            <td>${d["IMEI"] || "-"}</td>
+            <td>${d["IMSI"] || "-"}</td>
+            <td style="color:${warna};font-weight:bold;">
+              ${d["Status VTS"] || "-"}
+            </td>
+          </tr>
+        `;
+
+        tbody.insertAdjacentHTML("beforeend", row);
+      });
+    })
+    .catch((err) => {
+      console.error("ERROR VTS RANTAU =", err);
+      tbody.innerHTML =
+        "<tr><td colspan='7'>❌ Gagal ambil data Rantau</td></tr>";
+    });
+}
+
+function loadVTSPsu() {
+  const url =
+    "https://script.google.com/macros/s/AKfycbwEWKwgvMaoYVYWyThk3L5_qU7xTI4pfjTxc4pOvhhlF9gldFEvDg4tc1whiNhxO9tEpA/exec?sheet=Informasi%20VTS";
+
+  const tbody = document.querySelector("#vtsTablePSU tbody");
+
+  if (!tbody) {
+    console.error("tbody tidak ditemukan");
+    return;
+  }
+
+  tbody.innerHTML = "<tr><td colspan='7'>Loading...</td></tr>";
+
+  fetch(url)
+    .then((res) => {
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res.json();
+    })
+    .then((json) => {
+      console.log("DATA VTS PSU =", json);
+
+      const data = Array.isArray(json) ? json : json.data || [];
+
+      tbody.innerHTML = "";
+
+      if (!data.length) {
+        tbody.innerHTML = "<tr><td colspan='7'>Data kosong</td></tr>";
+        return;
+      }
+
+      data.forEach((d, i) => {
+        const status = String(d["Status VTS"] || "").toLowerCase();
+        const warna = status.includes("active") ? "#16a34a" : "#ef4444";
+
+        tbody.insertAdjacentHTML(
+          "beforeend",
+          `
+          <tr>
+            <td>${d["No"] || i + 1}</td>
+            <td>${d["Node"] || "-"}</td>
+            <td>${d["License Plate"] || "-"}</td>
+            <td>${d["Jenis kendaraan"] || "-"}</td>
+            <td>${d["IMEI"] || "-"}</td>
+            <td>${d["IMSI"] || "-"}</td>
+            <td style="color:${warna};font-weight:bold;">
+              ${d["Status VTS"] || "-"}
+            </td>
+          </tr>
+          `
+        );
+      });
+    })
+    .catch((err) => {
+      console.error("ERROR VTS PSU =", err);
+      tbody.innerHTML = "<tr><td colspan='7'>❌ Gagal ambil data PSU</td></tr>";
+    });
+}
 function submitCekRutin() {
   const data = {
     type: "cek_rutin",
@@ -901,7 +1706,7 @@ function submitCekRutin() {
   };
 
   fetch(
-    "https://script.google.com/macros/s/AKfycbyb_FKT3APvJ6x3PEY6V2TO9OTwN5qpt1ZlX0BK2-t9jTYoSul0VyC3xqVq-ptBVzoXZQ/exec",
+    "https://script.google.com/macros/s/AKfycbzdMdw6ZNMoj1IimADGcl2mVf0WHCgx9dBOys5BFPfMt4th8NmsuLlbO2DeZYV1aaPxRQ/exec",
     {
       method: "POST",
       body: JSON.stringify(data)
@@ -957,7 +1762,7 @@ function loadCekRutinReport() {
   document.getElementById("reportCekRutinSection").style.display = "block";
 
   fetch(
-    "https://script.google.com/macros/s/AKfycbyb_FKT3APvJ6x3PEY6V2TO9OTwN5qpt1ZlX0BK2-t9jTYoSul0VyC3xqVq-ptBVzoXZQ/exec?type=cek_rutin"
+    "https://script.google.com/macros/s/AKfycbzdMdw6ZNMoj1IimADGcl2mVf0WHCgx9dBOys5BFPfMt4th8NmsuLlbO2DeZYV1aaPxRQ/exec"
   )
     .then((res) => res.json())
     .then((data) => {
@@ -1021,27 +1826,103 @@ function normalizeText(text) {
   return (text || "").toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
+function detectArea(item) {
+  const vehicle = (
+    item["Vehicle id"] ||
+    item["vehicle id"] ||
+    ""
+  ).toLowerCase();
+
+  const plate = (
+    item["Plate License"] ||
+    item["plate license"] ||
+    ""
+  ).toLowerCase();
+
+  const gabung = vehicle + " " + plate;
+
+  if (gabung.includes("jambi")) return "jambi";
+  if (gabung.includes("rantau")) return "rantau";
+  if (gabung.includes("psu") || gabung.includes("pangkalan"))
+    return "pangkalan susu";
+
+  return "";
+}
+// ================= SET DROPDOWN 1 LEVEL (JOB + FIELD) =================
+(function () {
+  const select = document.getElementById("filterJob");
+  if (!select) return;
+
+  select.innerHTML = `
+    <option value="">Semua</option>
+
+        <option value="maintenance|">Maintenance (Semua)</option>
+    <option value="maintenance|PT.PERTAMINA ASSET 1 FIELD JAMBI">↳ Maintenance - PT.PERTAMINA ASSET 1 FIELD JAMBI</option>
+    <option value="maintenance|PT.PERTAMINA ASSET 1 FIELD RANTAU">↳ Maintenance - PT.PERTAMINA ASSET 1 FIELD RANTAU</option>
+    <option value="maintenance|PT.PERTAMINA ASSET 1 FIELD PANGKALAN SUSU">↳ Maintenance - PT.PERTAMINA ASSET 1 FIELD PANGKALAN SUSU</option>
+
+    <option value="cek rutin|">Cek Rutin (Semua)</option>
+    <option value="cek rutin|PT.PERTAMINA ASSET 1 FIELD JAMBIi">↳ Cek Rutin - PT.PERTAMINA ASSET 1 FIELD JAMBI</option>
+    <option value="cek rutin|PT.PERTAMINA ASSET 1 FIELD RANTAU">↳ Cek Rutin - PT.PERTAMINA ASSET 1 FIELD RANTAU</option>
+    <option value="cek rutin|PT.PERTAMINA ASSET 1 FIELD PANGKALAN SUSU">↳ cek rutin - PT.PERTAMINA ASSET 1 FIELD PANGKALAN SUSU</option>
+
+    <option value="Data Retrieval|">Data Retrieval (Semua)</option>
+    <option value="Data Retrieval|PT.PERTAMINA ASSET 1 FIELD JAMBI">↳ Data Retrieval - PT.PERTAMINA ASSET 1 FIELD JAMBI</option>
+    <option value="Data Retrieval|PT.PERTAMINA ASSET 1 FIELD RANTAU">↳ Data Retrieval - PT.PERTAMINA ASSET 1 FIELD RANTAU</option>
+    <option value="Data Retrieval|PT.PERTAMINA ASSET 1 FIELD PANGKALAN SUSU">↳ Data Retrieval - PT.PERTAMINA ASSET 1 FIELD PANGKALAN SUSU</option>
+
+    <option value="Dismantle|">Dismantle (Semua)</option>
+    <option value="Dismantle|PT.PERTAMINA ASSET 1 FIELD JAMBI">↳ Dismantle - PT.PERTAMINA ASSET 1 FIELD JAMBI</option>
+    <option value="Dismantle|PT.PERTAMINA ASSET 1 FIELD RANTAU">↳ Dismantle - PT.PERTAMINA ASSET 1 FIELD RANTAU</option>
+    <option value="Dismantle|PT.PERTAMINA ASSET 1 FIELD PANGKALAN SUSU">↳ Dismantle - PT.PERTAMINA ASSET 1 FIELD PANGKALAN SUSU</option>
+   
+    <option value="Re Installation|">Re Installation (Semua)</option>
+    <option value="Re Installation|PT.PERTAMINA ASSET 1 FIELD JAMBI">↳ Re Installation - PT.PERTAMINA ASSET 1 FIELD JAMBI</option>
+    <option value="Re Installation|PT.PERTAMINA ASSET 1 FIELD RANTAU">↳ Re Installation - PT.PERTAMINA ASSET 1 FIELD RANTAU</option>
+    <option value="Re Installation|PT.PERTAMINA ASSET 1 FIELD PANGKALAN SUSU">↳ Re Installation - PT.PERTAMINA ASSET 1 FIELD PANGKALAN SUSU</option>
+
+    <option value="Installation|">Installation (Semua)</option>
+    <option value="Installation|PT.PERTAMINA ASSET 1 FIELD JAMBI">↳ Installation - PT.PERTAMINA ASSET 1 FIELD JAMBI</option>
+    <option value="Installation|PT.PERTAMINA ASSET 1 FIELD RANTAU">↳ Installation - PT.PERTAMINA ASSET 1 FIELD RANTAU</option>
+    <option value="Installation|PT.PERTAMINA ASSET 1 FIELD PANGKALAN SUSU">↳ Installation - PT.PERTAMINA ASSET 1 FIELD PANGKALAN SUSU</option>
+
+    <option value="Ganti Unit|">Ganti Unit (Semua)</option>
+    <option value="Ganti Unit|PT.PERTAMINA ASSET 1 FIELD JAMBI">↳ Ganti Unit - PT.PERTAMINA ASSET 1 FIELD JAMBI</option>
+    <option value="Ganti Unit|PT.PERTAMINA ASSET 1 FIELD RANTAU">↳ Ganti Unit - PT.PERTAMINA ASSET 1 FIELD RANTAU</option>
+    <option value="Ganti Unit|PT.PERTAMINA ASSET 1 FIELD PANGKALAN SUSU">↳ PT.PERTAMINA ASSET 1 FIELD PANGKALAN SUSU - RANTAU</option>
+
+    <option value="Adding Acc|">Adding Acc (Semua)</option>
+    <option value="Adding Acc|PT.PERTAMINA ASSET 1 FIELD JAMBI">↳ Adding Acc - PT.PERTAMINA ASSET 1 FIELD JAMBI</option>
+    <option value="Adding Acc|PT.PERTAMINA ASSET 1 FIELD RANTAU">↳ Adding Acc - PT.PERTAMINA ASSET 1 FIELD RANTAU</option>
+    <option value="Adding Acc|PT.PERTAMINA ASSET 1 FIELD PANGKALAN SUSU">↳ Adding Acc - PT.PERTAMINA ASSET 1 FIELD PANGKALAN SUSU</option>
+
+
+  `;
+})();
 // ================= LOAD DASHBOARD =================
 function loadDashboardMaintenance() {
-  const selectedJob = document.getElementById("filterJob").value;
+  const selectedValue = document.getElementById("filterJob").value;
+
+  // 🔥 pecah jadi job dan field
+  const [job, field] = selectedValue.split("|");
+
+  const selected = normalizeText(job || "");
+  const selectedField = normalizeText(field || "");
 
   fetch(
-    "https://script.google.com/macros/s/AKfycbyb_FKT3APvJ6x3PEY6V2TO9OTwN5qpt1ZlX0BK2-t9jTYoSul0VyC3xqVq-ptBVzoXZQ/exec"
+    "https://script.google.com/macros/s/AKfycbzdMdw6ZNMoj1IimADGcl2mVf0WHCgx9dBOys5BFPfMt4th8NmsuLlbO2DeZYV1aaPxRQ/exec"
   )
     .then((res) => res.text())
     .then((text) => {
       let data;
       try {
         data = JSON.parse(text);
-        globalData = data; // 🔥 penting!
+        globalData = data;
       } catch {
         throw new Error("Response bukan JSON");
       }
 
       let grouped = {};
-      const selected = normalizeText(selectedJob);
-
-      // 🔥 TAMBAHAN KPI PROGRESS
       let progressCount = 0;
       let progressVehicles = [];
 
@@ -1052,24 +1933,31 @@ function loadDashboardMaintenance() {
         const date = parseTanggal(tanggal);
         if (!date) return;
 
+        // ================= FILTER JOB =================
         const workingTypeRaw =
           item["working type"] || item["Working type"] || "";
         const workingType = normalizeText(workingTypeRaw);
 
         if (selected && !workingType.includes(selected)) return;
 
-        // ================= HITUNG PROGRESS =================
+        // ================= FILTER FIELD =================
+        if (selectedField) {
+          const userName =
+            item["User name"] || item["user name"] || item["User Name"] || "";
+
+          if (!normalizeText(userName).includes(selectedField)) return;
+        }
+
+        // ================= AMBIL DATA =================
         const vehicle =
-          item["Vehicle id"] || // 🔥 INI YANG SESUAI DENGAN SHEET KAMU
-          item["vehicle id"] ||
-          item["Vehicle ID"] ||
-          "";
+          item["Vehicle id"] || item["vehicle id"] || item["Vehicle ID"] || "";
 
         const statusRaw =
           item["progres status"] || item["Progres Status"] || item["AF"] || "";
 
         const status = normalizeText(statusRaw);
 
+        // ================= HITUNG PROGRESS =================
         if (status.includes("progress")) {
           progressCount++;
 
@@ -1078,21 +1966,19 @@ function loadDashboardMaintenance() {
           }
         }
 
-        // ================= GROUPING CHART =================
+        // ================= GROUPING =================
         let key;
 
         if (selected === "dataretrieval") {
-          key =
-            date.getFullYear() +
-            "-" +
-            String(date.getMonth() + 1).padStart(2, "0") +
-            "-" +
-            String(date.getDate()).padStart(2, "0");
+          key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+            2,
+            "0"
+          )}-${String(date.getDate()).padStart(2, "0")}`;
         } else {
-          key =
-            date.getFullYear() +
-            "-" +
-            String(date.getMonth() + 1).padStart(2, "0");
+          key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+            2,
+            "0"
+          )}`;
         }
 
         if (!grouped[key]) grouped[key] = 0;
@@ -1105,7 +1991,6 @@ function loadDashboardMaintenance() {
 
       const values = rawLabels.map((k) => grouped[k]);
 
-      // 🎨 FORMAT LABEL
       const labels = rawLabels.map((l) => {
         if (selected === "dataretrieval") {
           const d = new Date(l);
@@ -1132,7 +2017,6 @@ function loadDashboardMaintenance() {
         "kpiUpdate"
       ).innerText = new Date().toLocaleTimeString("id-ID");
 
-      // 🔥 KPI ON PROGRESS
       document.getElementById("kpiProgress").innerText = progressCount;
 
       let displayList = progressVehicles.slice(0, 5).join(", ");
@@ -1140,45 +2024,76 @@ function loadDashboardMaintenance() {
 
       document.getElementById("kpiProgressList").innerText = displayList || "-";
 
-      // ================= CHART =================
-      renderChartTrend(labels, values, selectedJob);
+      renderChartTrend(labels, values, selectedValue);
     })
     .catch((err) => {
       alert("Gagal load dashboard");
       console.error(err);
     });
 }
-// ================= RENDER CHART =================
+// ================= RENDER CHART PROFESSIONAL =================
 function renderChartTrend(labels, data, jobName) {
-  const ctx = document.getElementById("chartMaintenance");
+  const canvas = document.getElementById("chartMaintenance");
+  const ctx = canvas.getContext("2d");
 
   if (chartInstance) {
     chartInstance.destroy();
   }
 
+  // ===== gradient fill =====
+  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+  gradient.addColorStop(0, "rgba(37,99,235,.35)");
+  gradient.addColorStop(0.5, "rgba(37,99,235,.12)");
+  gradient.addColorStop(1, "rgba(255,255,255,0)");
+
+  // ===== glow line =====
+  const glowGradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+  glowGradient.addColorStop(0, "#60a5fa");
+  glowGradient.addColorStop(0.5, "#2563eb");
+  glowGradient.addColorStop(1, "#1d4ed8");
+
   chartInstance = new Chart(ctx, {
     type: "line",
     data: {
-      labels: labels,
+      labels,
       datasets: [
         {
-          label: jobName ? "Trend " + jobName : "Semua Job",
-          data: data,
+          label: jobName ? `Trend ${jobName}` : "Semua Job",
+          data,
           fill: true,
-          tension: 0.35,
-          borderWidth: 2,
-          pointRadius: 4,
-          pointHoverRadius: 6,
-          borderColor: "#2563eb",
-          backgroundColor: "rgba(37, 99, 235, 0.15)"
+          backgroundColor: gradient,
+          borderColor: glowGradient,
+          borderWidth: 4,
+          tension: 0.42,
+
+          pointRadius: 3,
+          pointHoverRadius: 8,
+          pointHitRadius: 20,
+
+          pointBackgroundColor: "#ffffff",
+          pointBorderColor: "#2563eb",
+          pointBorderWidth: 3,
+
+          hoverBorderWidth: 4
         }
       ]
     },
+
     options: {
       responsive: true,
       maintainAspectRatio: false,
 
-      // 🔥 TAMBAHAN CLICK EVENT
+      interaction: {
+        intersect: false,
+        mode: "index"
+      },
+
+      animation: {
+        duration: 1400,
+        easing: "easeOutQuart"
+      },
+
+      // klik detail
       onClick: (evt, elements) => {
         if (elements.length > 0) {
           const index = elements[0].index;
@@ -1189,30 +2104,71 @@ function renderChartTrend(labels, data, jobName) {
 
       plugins: {
         legend: {
-          display: true,
+          position: "top",
+          align: "start",
           labels: {
-            color: "#333"
+            color: "#111827",
+            usePointStyle: true,
+            pointStyle: "circle",
+            boxWidth: 10,
+            padding: 25,
+            font: {
+              size: 13,
+              weight: "600"
+            }
           }
         },
+
         tooltip: {
-          backgroundColor: "#111",
+          padding: 14,
+          cornerRadius: 14,
+          caretSize: 8,
+          displayColors: false,
+
+          backgroundColor: "rgba(17,24,39,.95)",
+          titleColor: "#fff",
+          bodyColor: "#dbeafe",
+          borderColor: "rgba(255,255,255,.08)",
+          borderWidth: 1,
+
           callbacks: {
-            label: (ctx) => "Jumlah: " + ctx.raw
+            title: (items) => "Tanggal : " + items[0].label,
+            label: (ctx) => "Jumlah Job : " + ctx.raw
           }
         }
       },
 
       scales: {
         x: {
-          grid: { display: false }
-        },
-        y: {
-          beginAtZero: true,
           grid: {
-            color: "rgba(0,0,0,0.05)"
+            display: false
           },
           ticks: {
-            precision: 0
+            color: "#6b7280",
+            font: {
+              size: 12,
+              weight: "500"
+            }
+          }
+        },
+
+        y: {
+          beginAtZero: true,
+
+          grid: {
+            drawBorder: false,
+            color: "rgba(148,163,184,.15)",
+            lineWidth: 1
+          },
+
+          ticks: {
+            precision: 0,
+            color: "#6b7280",
+            padding: 10,
+            font: {
+              size: 12,
+              weight: "500"
+            }
           }
         }
       }
@@ -1228,44 +2184,190 @@ function showDetailByLabel(label, selectedJob) {
     return;
   }
 
-  const selected = normalizeText(selectedJob);
+  console.clear();
+  console.log("🟢 LABEL CHART DIKLIK:", label);
+  console.log("🟢 SELECTED JOB:", selectedJob);
 
-  globalData.forEach((item) => {
+  // 🔥 pecah job dan field
+  const [job, field] = (selectedJob || "").split("|");
+
+  const selected = normalizeText(job || "");
+  const selectedField = normalizeText(field || "");
+
+  let found = false;
+
+  globalData.forEach((item, i) => {
     let tanggal = item["Tanggal"] || item["tanggal"] || "";
     if (!tanggal) return;
 
     const date = parseTanggal(tanggal);
     if (!date) return;
 
+    // 🔍 DEBUG TANGGAL
+    console.log(
+      `Row ${i + 1}`,
+      "| Raw:",
+      tanggal,
+      "| Parsed:",
+      date,
+      "| Day:",
+      date.getDate(),
+      "| Month:",
+      date.getMonth(),
+      "| Year:",
+      date.getFullYear()
+    );
+
     const workingType = normalizeText(
       item["working type"] || item["Working type"] || ""
     );
 
+    // ================= FILTER JOB =================
     if (selected && !workingType.includes(selected)) return;
 
-    let match = false;
+    // 🔥 ================= FILTER FIELD =================
+    if (selectedField) {
+      const userName =
+        item["User name"] || item["user name"] || item["User Name"] || "";
 
+      if (!normalizeText(userName).includes(selectedField)) return;
+    }
+
+    let match = false;
     // 🔥 MATCH BERDASARKAN DATA ASLI (BUKAN TEXT)
     if (selected === "dataretrieval") {
-      // ambil label → convert ke date
-      const labelDate = new Date(label + " " + new Date().getFullYear());
+  const bulanMap = {
+    jan: 0,
+    januari: 0,
 
-      match =
-        date.getDate() === labelDate.getDate() &&
-        date.getMonth() === labelDate.getMonth();
-    } else {
-      const [monthName, year] = label.split(" ");
-      const labelDate = new Date(monthName + " 1, " + year);
+    feb: 1,
+    februari: 1,
 
-      match =
-        date.getMonth() === labelDate.getMonth() &&
-        date.getFullYear() === labelDate.getFullYear();
+    mar: 2,
+    maret: 2,
+
+    apr: 3,
+    april: 3,
+
+    mei: 4,
+
+    jun: 5,
+    juni: 5,
+
+    jul: 6,
+    juli: 6,
+
+    agu: 7,
+    agustus: 7,
+
+    sep: 8,
+    september: 8,
+
+    okt: 9,
+    oktober: 9,
+
+    nov: 10,
+    november: 10,
+
+    des: 11,
+    desember: 11
+  };
+
+  const parts = label.trim().split(/\s+/);
+
+  const day = parseInt(parts[0]);
+  const monthName = (parts[1] || "").toLowerCase();
+  const month = bulanMap[monthName];
+  const year = date.getFullYear();
+
+  console.log(
+    "📌 DATARETRIEVAL MATCH:",
+    "| Day:", day,
+    "| Month:", month,
+    "| Year:", year
+  );
+
+  if (!isNaN(day) && month !== undefined) {
+    match =
+      date.getDate() === day &&
+      date.getMonth() === month &&
+      date.getFullYear() === year;
+  }
+}
+    else {
+      const bulanMap = {
+        jan: 0,
+        january: 0,
+
+        feb: 1,
+        february: 1,
+
+        mar: 2,
+        march: 2,
+
+        apr: 3,
+        april: 3,
+
+        may: 4,
+        mei: 4,
+
+        jun: 5,
+        june: 5,
+
+        jul: 6,
+        july: 6,
+
+        aug: 7,
+        august: 7,
+
+        sep: 8,
+        sept: 8,
+        september: 8,
+
+        oct: 9,
+        okt: 9,
+        oktober: 9,
+        october: 9,
+
+        nov: 10,
+        november: 10,
+
+        dec: 11,
+        des: 11, // 🔥 FIX
+        desember: 11,
+        december: 11
+      };
+
+      const parts = label.trim().split(/\s+/);
+      const monthName = (parts[0] || "").toLowerCase();
+      const year = parseInt(parts[1]);
+
+      const targetMonth = bulanMap[monthName];
+
+      // 🔍 DEBUG LABEL
+      console.log(
+        "📌 BULAN MATCH:",
+        "| Label:",
+        label,
+        "| MonthName:",
+        monthName,
+        "| TargetMonth:",
+        targetMonth,
+        "| Year:",
+        year
+      );
+
+      if (targetMonth !== undefined && !isNaN(year)) {
+        match = date.getMonth() === targetMonth && date.getFullYear() === year;
+      }
     }
+
+    // 🔍 DEBUG MATCH
+    console.log("✅ MATCH?", match, "| Tanggal:", tanggal, "| Label:", label);
 
     if (!match) return;
 
     const vehicle = item["Vehicle id"] || item["vehicle id"] || "-";
-
     const status = item["Progres Status"] || item["progres status"] || "-";
 
     const tr = `
@@ -1278,7 +2380,18 @@ function showDetailByLabel(label, selectedJob) {
     `;
 
     tbody.innerHTML += tr;
+    found = true;
   });
+
+  if (!found) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="4" style="text-align:center;color:#888;padding:25px;">
+          Tidak ada data untuk <b>${label}</b>
+        </td>
+      </tr>
+    `;
+  }
 
   document.getElementById("modalDetail").style.display = "block";
 }
@@ -1335,44 +2448,109 @@ loadWorkingTypeNotification();
 // ===================== KIRIM KE GOOGLE SHEET =====================
 async function sendToGoogleSheet(formData) {
   const scriptURL =
-    "https://script.google.com/macros/s/AKfycbyb_FKT3APvJ6x3PEY6V2TO9OTwN5qpt1ZlX0BK2-t9jTYoSul0VyC3xqVq-ptBVzoXZQ/exec";
+    "https://script.google.com/macros/s/AKfycbzdMdw6ZNMoj1IimADGcl2mVf0WHCgx9dBOys5BFPfMt4th8NmsuLlbO2DeZYV1aaPxRQ/exec";
 
   const loader = document.getElementById("loaderOverlay");
-  loader.style.display = "flex";
+  if (loader) loader.style.display = "flex";
 
   try {
-    await fetch(scriptURL, {
+
+    const fd = new FormData();
+
+    fd.append("data", JSON.stringify(formData));
+
+    const res = await fetch(scriptURL, {
       method: "POST",
-      mode: "no-cors",
-      body: JSON.stringify(formData),
-      headers: { "Content-Type": "application/json" }
+      body: fd
     });
+    
+    alert("✅ Data + foto berhasil dikirim");
 
-    alert("✅ Data dan foto berhasil disimpan!");
-
+    // =========================
+    // RESET FORM
+    // =========================
     const form = document.getElementById("jobForm");
     if (form) form.reset();
 
-    document.getElementById("jobNumber").textContent = "";
-    document.getElementById("current-date").textContent = "";
+    // reset preview foto kalau ada
+    const preview = document.getElementById("previewImage");
+    if (preview) {
+      preview.src = "";
+      preview.style.display = "none";
+    }
 
-    if (typeof generateJobNumber === "function") generateJobNumber();
-  } catch (error) {
-    alert("❌ Gagal mengirim data ke Google Sheet!\n" + error.message);
+    // reset text area manual kalau perlu
+    const deskripsi = document.getElementById("deskripsiPekerjaan");
+    if (deskripsi) deskripsi.value = "";
+
+    // generate nomor job baru
+    if (typeof generateJobNumber === "function") {
+      generateJobNumber();
+    }
+
+    // update tanggal baru
+    const tanggal = document.getElementById("current-date");
+    if (tanggal) {
+      tanggal.textContent = new Date().toLocaleString("id-ID");
+    }
+
+    // scroll ke atas
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+
+  } catch (err) {
+    console.error("❌ Error:", err);
+    alert("❌ Gagal kirim");
   } finally {
-    loader.style.display = "none";
+    if (loader) loader.style.display = "none";
   }
 }
-
 // ===================== HIDE SEMUA =====================
 function hideAllSections() {
-  document.querySelector("main").style.display = "none";
+  // main
+  const main = document.querySelector("main");
+  if (main) main.style.display = "none";
 
+  // report umum
   document.querySelectorAll(".report-section").forEach((el) => {
     el.style.display = "none";
   });
-}
 
+  // 🔥 hide laporan foto
+  document.querySelectorAll(".photo-report-section").forEach((el) => {
+    el.style.display = "none";
+  });
+
+  const photoSection = document.getElementById("photoReportSection");
+  if (photoSection) {
+    photoSection.style.display = "none";
+  }
+
+  // 🔥 semua section VTS HARUS DIPAKSA HIDE
+  const vtsSections = ["vtsSection", "vtsSectionRantau", "vtsSectionPSU"];
+
+  vtsSections.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.style.display = "none";
+
+      // kalau mau bersihkan isi:
+      // el.querySelector("tbody")?.innerHTML = "";
+    }
+  });
+
+  // slide panel
+  document.querySelectorAll(".slide-panel").forEach((el) => {
+    el.classList.remove("open");
+  });
+
+  // monitoring panel
+  document.querySelectorAll(".monitoring-panel").forEach((el) => {
+    el.classList.remove("open");
+  });
+}
 // ===================== FORM =====================
 function showForm() {
   hideAllSections();
@@ -1423,54 +2601,237 @@ function showDashboardMaintenance() {
   document.getElementById("slidePanel").classList.remove("open");
 }
 
-// ===================== MONITORING KONTRAK VTS =====================
-function showMonitoringKontrak() {
-  // 🔥 1. Sembunyikan semua halaman
-  document.querySelectorAll(".report-section").forEach((sec) => {
-    sec.style.display = "none";
-  });
+function showVTS() {
+  hideAllSections();
 
-  // 🔥 2. Tampilkan monitoring saja
+  const el = document.getElementById("vtsSection");
+  if (el) el.style.display = "block";
+
+  loadVTS();
+}
+
+function showVTSRantau() {
+  hideAllSections();
+
+  const el = document.getElementById("vtsSectionRantau");
+  if (el) el.style.display = "block";
+
+  loadVTSRantau();
+}
+
+function showVTSPSU() {
+  hideAllSections();
+
+  const el = document.getElementById("vtsSectionPSU");
+  if (el) el.style.display = "block";
+
+  if (typeof loadVTSPsu === "function") {
+    loadVTSPsu();
+  } else {
+    console.error("❌ loadVTSPsu belum dibuat");
+  }
+}
+
+function showMonitoringKontrak(type = "jambi") {
+  hideAllSections();
+
   const section = document.getElementById("monitoringKontrakSection");
+  if (!section) {
+    console.error("❌ monitoringKontrakSection tidak ditemukan");
+    return;
+  }
+
   section.style.display = "block";
 
-  // 🔥 3. Load data
-  generateTanggalHeader();
-  loadMonitoringData();
+  let title = "Monitoring Harian VTS Pertamina Jambi";
 
-  // 🔥 4. Scroll ke atas (biar berasa pindah halaman)
+  if (type === "rantau") {
+    title = "Monitoring Harian VTS Pertamina Rantau";
+  }
+
+  if (type === "psu") {
+    title = "Monitoring Harian VTS Pertamina PSU";
+  }
+
+  const titleMain = document.getElementById("titleMain");
+  if (titleMain) {
+    titleMain.textContent = title;
+  }
+
+  // 🔥 penting: reset header + load data pakai type
+  generateTanggalHeader();
+  loadMonitoringData(type);
+
   window.scrollTo({ top: 0, behavior: "smooth" });
 
-  // 🔥 5. Tutup semua panel menu
+  document.getElementById("slidePanel")?.classList.remove("open");
+  document.getElementById("monitoringPanel")?.classList.remove("open");
+  document.getElementById("monitoringPanelRantau")?.classList.remove("open");
+  document.getElementById("monitoringPanelPSU")?.classList.remove("open");
+}
+
+function showProgressReport(type = "jambi") {
+  hideAllSections();
+
+  document.getElementById("progressReportSection").style.display = "block";
+
+  loadProgressReport(type);
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+
   document.getElementById("slidePanel").classList.remove("open");
   document.getElementById("monitoringPanel").classList.remove("open");
+  document.getElementById("monitoringPanelRantau").classList.remove("open");
+  document.getElementById("monitoringPanelPSU").classList.remove("open");
 }
-function showSummaryDayVTS() {
+
+function showSummaryDayVTS(type = "jambi") {
   hideAllSections();
 
   document.getElementById("summaryDaySection").style.display = "block";
 
-  loadSummaryDay();
+  loadSummaryDay(type);
 
   window.scrollTo({ top: 0, behavior: "smooth" });
 
   document.getElementById("slidePanel").classList.remove("open");
   document.getElementById("monitoringPanel").classList.remove("open");
+  document.getElementById("monitoringPanelRantau").classList.remove("open");
+  document.getElementById("monitoringPanelPSU").classList.remove("open");
 }
-function toggleMonitoringPanel() {
-  const panel = document.getElementById("monitoringPanel");
-  const mainPanel = document.getElementById("slidePanel");
 
-  // tutup menu utama
-  mainPanel.classList.remove("open");
+// ===================== TOGGLE MENU UTAMA =====================
+function togglePanel(e) {
+  if (e) e.stopPropagation();
 
-  // toggle monitoring
+  const btn = e.currentTarget;
+  const panel = document.getElementById("slidePanel");
+
+  const rect = btn.getBoundingClientRect();
+
+  panel.style.left = rect.left + "px";
+  panel.style.top = rect.bottom + 8 + "px";
+  panel.style.width = rect.width + "px";
+
   panel.classList.toggle("open");
 }
+// ===================== TOGGLE MONITORING =====================
+function toggleMonitoringPanel(type, btn, e) {
+  if (e) e.stopPropagation();
 
-const API_URL =
-  "https://script.google.com/macros/s/AKfycbxdlTGtyAdapfCRhFgiB9E2gWqpUVwSU5ZxqY70SC3Bqi9tKSXciehwADcjlc64vJ-_QA/exec";
+  document.querySelectorAll(".monitoring-panel").forEach((p) => {
+    p.classList.remove("open");
+  });
 
+  let panel;
+
+  if (type === "jambi") panel = document.getElementById("monitoringPanel");
+  if (type === "rantau")
+    panel = document.getElementById("monitoringPanelRantau");
+  if (type === "psu") panel = document.getElementById("monitoringPanelPSU");
+
+  if (!panel || !btn) return;
+
+  const rect = btn.getBoundingClientRect();
+
+  /* posisi tepat di bawah tombol */
+  panel.style.left = rect.left + "px";
+  panel.style.top = rect.bottom + 8 + "px";
+
+  /* 🔥 lebar otomatis ikut tombol */
+  panel.style.width = rect.width + "px";
+
+  panel.classList.toggle("open");
+}
+// ===================== CLOSE ALL PANEL =====================
+function closeAllPanels() {
+  document.querySelectorAll(".slide-panel").forEach((panel) => {
+    panel.classList.remove("open");
+  });
+}
+
+// ===================== TOGGLE PANEL UTAMA =====================
+function togglePanel(e) {
+  if (e) e.stopPropagation();
+
+  const panel = document.getElementById("slidePanel");
+
+  // cek status sebelum ditutup semua
+  const isOpen = panel.classList.contains("open");
+
+  // tutup semua panel dulu
+  closeAllPanels();
+
+  // kalau sebelumnya belum open → buka
+  if (!isOpen) {
+    const btn = e.currentTarget;
+    const rect = btn.getBoundingClientRect();
+
+    panel.style.left = rect.left + "px";
+    panel.style.top = rect.bottom + 8 + "px";
+    panel.style.width = rect.width + "px";
+
+    panel.classList.add("open");
+  }
+}
+
+// ===================== TOGGLE MONITORING PANEL =====================
+function toggleMonitoringPanel(type, btn, e) {
+  if (e) e.stopPropagation();
+
+  let panel = null;
+
+  if (type === "jambi") {
+    panel = document.getElementById("monitoringPanel");
+  }
+
+  if (type === "rantau") {
+    panel = document.getElementById("monitoringPanelRantau");
+  }
+
+  if (type === "psu") {
+    panel = document.getElementById("monitoringPanelPSU");
+  }
+
+  if (!panel) return;
+
+  // cek status dulu
+  const isOpen = panel.classList.contains("open");
+
+  // tutup semua
+  closeAllPanels();
+
+  // buka panel yg dipilih kalau sebelumnya tertutup
+  if (!isOpen) {
+    const rect = btn.getBoundingClientRect();
+
+    panel.style.left = rect.left + "px";
+    panel.style.top = rect.bottom + 8 + "px";
+    panel.style.width = rect.width + "px";
+
+    panel.classList.add("open");
+  }
+}
+
+// ===================== AUTO CLOSE (KLIK LUAR) =====================
+document.addEventListener("click", function (e) {
+  const klikDiPanel = e.target.closest(".slide-panel");
+  const klikDiTombol = e.target.closest(".slide-btn");
+
+  if (!klikDiPanel && !klikDiTombol) {
+    closeAllPanels();
+  }
+});
+const API_MAP = {
+  jambi:
+    "https://script.google.com/macros/s/AKfycbxdlTGtyAdapfCRhFgiB9E2gWqpUVwSU5ZxqY70SC3Bqi9tKSXciehwADcjlc64vJ-_QA/exec",
+
+  rantau:
+    "https://script.google.com/macros/s/AKfycbx2qYSANHLW5_rwBnoEf6W1bUVNPc3q1QFi8QqeeC7Ve_ubCZcRl7Z1rQEbLzaxkB4l/exec",
+
+  psu:
+    "https://script.google.com/macros/s/AKfycbwEWKwgvMaoYVYWyThk3L5_qU7xTI4pfjTxc4pOvhhlF9gldFEvDg4tc1whiNhxO9tEpA/exec"
+};
 // 🔥 helper ambil value fleksibel (anti beda nama kolom)
 function getVal(d, keys) {
   for (let k of keys) {
@@ -1506,7 +2867,11 @@ function generateTanggalHeader() {
     header.appendChild(th);
   }
 }
-async function loadMonitoringData() {
+
+// =========================
+// 🔥 LOAD MULTI LOCATION
+// =========================
+async function loadMonitoringData(type = "jambi") {
   const tbody = document.getElementById("monitoringTableBody");
 
   if (!tbody) {
@@ -1517,37 +2882,73 @@ async function loadMonitoringData() {
   tbody.innerHTML = "<tr><td colspan='50'>Loading...</td></tr>";
 
   try {
-    // 🔥 PENTING: arahkan ke sheet Monitoring
-    const res = await fetch(API_URL + "?sheet=Monitoring");
+    const API_URL = API_MAP[type];
 
-    if (!res.ok) throw new Error("HTTP " + res.status);
+    console.log("TYPE =", type);
+    console.log("API URL =", API_URL);
 
-    const json = await res.json();
+    if (!API_URL) {
+      throw new Error("API tidak ditemukan: " + type);
+    }
 
-    console.log("DATA API:", json);
+    const url = API_URL + "?sheet=Monitoring";
+
+    console.log("REQUEST =", url);
+
+    const res = await fetch(url);
+
+    console.log("STATUS =", res.status);
+    console.log("OK =", res.ok);
+    console.log("CONTENT TYPE =", res.headers.get("content-type"));
+
+    if (!res.ok) {
+      throw new Error("HTTP " + res.status);
+    }
+
+    // 🔥 ambil raw dulu biar ketahuan isi response asli
+    const raw = await res.text();
+
+    console.log("RAW RESPONSE ↓↓↓");
+    console.log(raw);
+
+    let json;
+
+    try {
+      json = JSON.parse(raw);
+    } catch (parseErr) {
+      console.error("❌ JSON parse gagal:", parseErr);
+      throw new Error("Response bukan JSON valid");
+    }
+
+    console.log("DATA API =", json);
 
     // =========================
-    // 🔥 HEADER (JUDUL ATAS)
+    // 🔥 HEADER
     // =========================
     if (json.header && json.header.length) {
       const titleMain = document.getElementById("titleMain");
       const titleSub = document.getElementById("titleSub");
 
       if (titleMain) {
-        titleMain.innerText = json.header[0] || "";
-        titleMain.style.fontSize = "26px"; // 🔥 lebih besar
-        titleMain.style.fontWeight = "800"; // 🔥 lebih tebal
+        let lokasiText = "Jambi";
+        if (type === "rantau") lokasiText = "Rantau";
+        if (type === "psu") lokasiText = "PSU";
+
+        titleMain.innerText =
+          json.header[0] || `Monitoring Harian VTS Pertamina ${lokasiText}`;
+
+        titleMain.style.fontSize = "26px";
+        titleMain.style.fontWeight = "800";
         titleMain.style.marginBottom = "12px";
-        titleMain.style.letterSpacing = "0.5px"; // biar lebih elegan
+        titleMain.style.letterSpacing = "0.5px";
       }
 
       if (titleSub) {
         const subText = json.header[1] || "";
 
-        // style container
-        titleSub.style.fontSize = "15px"; // 🔥 diperbesar
+        titleSub.style.fontSize = "15px";
         titleSub.style.color = "#222";
-        titleSub.style.lineHeight = "1.8"; // lebih lega
+        titleSub.style.lineHeight = "1.8";
 
         const parts = subText.split("|");
 
@@ -1557,17 +2958,20 @@ async function loadMonitoringData() {
 
             if (split.length >= 2) {
               return `
-      <div style="
-        display:grid;
-        grid-template-columns:150px 10px auto;
-        margin:3px 0;
-        align-items:center;
-      ">
-        <span style="font-weight:800;">${split[0].trim()}</span>
-        <span style="text-align:center;">:</span>
-        <span style="font-weight:600;">${split.slice(1).join(":").trim()}</span>
-      </div>
-    `;
+                <div style="
+                  display:grid;
+                  grid-template-columns:150px 10px auto;
+                  margin:3px 0;
+                  align-items:center;
+                ">
+                  <span style="font-weight:800;">${split[0].trim()}</span>
+                  <span style="text-align:center;">:</span>
+                  <span style="font-weight:600;">${split
+                    .slice(1)
+                    .join(":")
+                    .trim()}</span>
+                </div>
+              `;
             }
 
             return `<div>${p.trim()}</div>`;
@@ -1575,15 +2979,16 @@ async function loadMonitoringData() {
           .join("");
       }
     }
+
     // =========================
     // 🔥 DATA
     // =========================
-    const data = Array.isArray(json) ? json : json.data || [];
+    const data = json.data || [];
 
     tbody.innerHTML = "";
 
     if (!data.length) {
-      tbody.innerHTML = "<tr><td colspan='50'>Data kosong</td></tr>";
+      tbody.innerHTML = "<tr><td colspan='50'>⚠ Data kosong</td></tr>";
       return;
     }
 
@@ -1596,11 +3001,13 @@ async function loadMonitoringData() {
           <td>${getVal(d, ["Jenis kendaraan", "Jenis Kendaraan"])}</td>
           <td>${getVal(d, ["IMEI"])}</td>
           <td>${getVal(d, ["IMSI"])}</td>
+
           <td class="${
             getVal(d, ["Status VTS"]) === "Active" ? "active" : "inactive"
           }">
             ${getVal(d, ["Status VTS"])}
           </td>
+
           <td>${getVal(d, ["Status RFID"])}</td>
           <td>${getVal(d, ["Status Fuel Stock", "Status Fuel Stick"])}</td>
           <td>${getVal(d, ["Remarks"])}</td>
@@ -1609,7 +3016,7 @@ async function loadMonitoringData() {
       `;
 
       for (let i = 1; i <= 31; i++) {
-        let val = getTanggalValue(d, i);
+        const val = getTanggalValue(d, i);
 
         row += `
           <td class="${
@@ -1620,32 +3027,25 @@ async function loadMonitoringData() {
         `;
       }
 
-      row += `</tr>`;
+      row += "</tr>";
       tbody.innerHTML += row;
     });
   } catch (err) {
-    console.error("LOAD MONITORING ERROR:", err);
-    tbody.innerHTML = "<tr><td colspan='50'>❌ Gagal load data</td></tr>";
+    console.error("LOAD MONITORING ERROR =", err);
+    console.error("MESSAGE =", err.message);
+
+    tbody.innerHTML =
+      "<tr><td colspan='50'>❌ Gagal load data (cek console)</td></tr>";
   }
 }
-// ✅ AUTO JALAN
+// =========================
+// 🔥 AUTO DEFAULT JAMI
+// =========================
 window.addEventListener("DOMContentLoaded", () => {
   generateTanggalHeader();
-  loadMonitoringData();
+  loadMonitoringData("jambi");
 });
-function showMonitoringKontrak() {
-  hideAllSections();
 
-  document.getElementById("monitoringKontrakSection").style.display = "block";
-
-  generateTanggalHeader();
-  loadMonitoringData();
-
-  window.scrollTo({ top: 0, behavior: "smooth" });
-
-  document.getElementById("slidePanel").classList.remove("open");
-  document.getElementById("monitoringPanel").classList.remove("open");
-}
 function downloadExcelFix() {
   try {
     if (typeof XLSX === "undefined") {
@@ -1776,66 +3176,85 @@ function downloadExcelFix() {
     alert("❌ Export gagal (lihat console)");
   }
 }
-function showProgressReport() {
-  // 🔥 1. Sembunyikan semua halaman (pakai fungsi global kamu)
-  hideAllSections();
 
-  // 🔥 2. Tampilkan section Progress Report
-  const section = document.getElementById("progressReportSection");
-  section.style.display = "block";
+const PROGRESS_API_MAP = {
+  jambi:
+    "https://script.google.com/macros/s/AKfycbxdlTGtyAdapfCRhFgiB9E2gWqpUVwSU5ZxqY70SC3Bqi9tKSXciehwADcjlc64vJ-_QA/exec",
 
-  // 🔥 3. Generate data dari Monitoring
-  generateProgressFromMonitoring();
+  rantau:
+    "https://script.google.com/macros/s/AKfycbx2qYSANHLW5_rwBnoEf6W1bUVNPc3q1QFi8QqeeC7Ve_ubCZcRl7Z1rQEbLzaxkB4l/exec?sheet=Progres%20Report",
 
-  // 🔥 4. Scroll ke atas
-  window.scrollTo({ top: 0, behavior: "smooth" });
-
-  // 🔥 5. Tutup semua panel menu
-  document.getElementById("slidePanel").classList.remove("open");
-  document.getElementById("monitoringPanel").classList.remove("open");
-}
-const PROGRESS_API =
-  "https://script.google.com/macros/s/AKfycbxdlTGtyAdapfCRhFgiB9E2gWqpUVwSU5ZxqY70SC3Bqi9tKSXciehwADcjlc64vJ-_QA/exec?sheet=Progres%20Report";
-async function loadProgressReport() {
+  psu:
+    "https://script.google.com/macros/s/AKfycbwEWKwgvMaoYVYWyThk3L5_qU7xTI4pfjTxc4pOvhhlF9gldFEvDg4tc1whiNhxO9tEpA/exec?sheet=Progres%20Report"
+};
+// =========================
+// 🔥 LOAD PROGRESS REPORT (MULTI AREA)
+// =========================
+async function loadProgressReport(type = "jambi") {
   const tbody = document.getElementById("progressTableBody");
 
   tbody.innerHTML = `<tr><td colspan="10">⏳ Loading data...</td></tr>`;
 
   try {
-    const res = await fetch(PROGRESS_API);
-    if (!res.ok) throw new Error("HTTP error " + res.status);
+    const PROGRESS_API = PROGRESS_API_MAP[type];
+
+    if (!PROGRESS_API) {
+      throw new Error("API tidak ditemukan untuk: " + type);
+    }
+
+    // 🔥 tambahkan parameter sheet
+    const url =
+      PROGRESS_API +
+      (PROGRESS_API.includes("?") ? "&" : "?") +
+      "sheet=" +
+      encodeURIComponent("Progres Report");
+
+    console.log("TYPE =", type);
+    console.log("REQUEST =", url);
+
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      throw new Error("HTTP error " + res.status);
+    }
 
     const json = await res.json();
+
     console.log("DATA PROGRESS:", json);
 
     // =========================
-    // 🔥 HEADER (JUDUL ATAS)
+    // 🔥 HEADER
     // =========================
     if (json.header) {
       const title = document.getElementById("progressTitle");
       const info = document.getElementById("progressInfo");
 
+      let lokasi = "Jambi";
+      if (type === "rantau") lokasi = "Rantau";
+      if (type === "psu") lokasi = "PSU";
+
       if (title) {
-        title.innerText = "📈 " + (json.header.title || "Progress Report VTS");
+        title.innerText =
+          "📈 " + (json.header.title || `Progress Report VTS ${lokasi}`);
       }
 
       if (info) {
         info.innerHTML = `
           <div><b>Customer</b> : ${json.header.customer || "-"}</div>
           <div><b>Job Type</b> : ${json.header.job || "-"}</div>
-          <div><b>Area</b> : ${json.header.area || "-"}</div>
+          <div><b>Area</b> : ${json.header.area || lokasi}</div>
         `;
       }
     }
 
     // =========================
-    // 🔥 DATA TABEL
+    // 🔥 DATA
     // =========================
-    const data = Array.isArray(json) ? json : json.data || [];
+    const data = json.data || [];
 
     tbody.innerHTML = "";
 
-    if (!data || data.length === 0) {
+    if (!data.length) {
       tbody.innerHTML = `<tr><td colspan="10">Data kosong</td></tr>`;
       return;
     }
@@ -1847,32 +3266,20 @@ async function loadProgressReport() {
         <tr>
           <td>${no++}</td>
           <td>${item.Node || "-"}</td>
-          <td>${item["License Plate"] || "-"}</td>
+          <td>${item["License Plate"] || item["Licence plate"] || "-"}</td>
           <td>${item["Status VTS"] || "-"}</td>
           <td>${item.IMEI || "-"}</td>
           <td>${item.IMSI || "-"}</td>
           <td>${item.Status || "-"}</td>
         </tr>
       `;
+
       tbody.innerHTML += row;
     });
   } catch (err) {
     console.error("LOAD PROGRESS ERROR:", err);
     tbody.innerHTML = `<tr><td colspan="10">❌ Gagal load data</td></tr>`;
   }
-}
-function showProgressReport() {
-  hideAllSections();
-
-  document.getElementById("progressReportSection").style.display = "block";
-
-  // 🔥 load dari Google Sheet
-  loadProgressReport();
-
-  window.scrollTo({ top: 0, behavior: "smooth" });
-
-  document.getElementById("slidePanel").classList.remove("open");
-  document.getElementById("monitoringPanel").classList.remove("open");
 }
 function downloadProgressExcel() {
   try {
@@ -2002,8 +3409,16 @@ function downloadProgressExcel() {
     alert("❌ Gagal download, cek console (F12)");
   }
 }
-const SUMMARY_API =
-  "https://script.google.com/macros/s/AKfycbxdlTGtyAdapfCRhFgiB9E2gWqpUVwSU5ZxqY70SC3Bqi9tKSXciehwADcjlc64vJ-_QA/exec?sheet=Summary%20Day";
+const SUMMARY_API_MAP = {
+  jambi:
+    "https://script.google.com/macros/s/AKfycbxdlTGtyAdapfCRhFgiB9E2gWqpUVwSU5ZxqY70SC3Bqi9tKSXciehwADcjlc64vJ-_QA/exec?sheet=Summary%20Day",
+
+  rantau:
+    "https://script.google.com/macros/s/AKfycbx2qYSANHLW5_rwBnoEf6W1bUVNPc3q1QFi8QqeeC7Ve_ubCZcRl7Z1rQEbLzaxkB4l/exec?sheet=Summary%20Day",
+
+  psu:
+    "https://script.google.com/macros/s/AKfycbwEWKwgvMaoYVYWyThk3L5_qU7xTI4pfjTxc4pOvhhlF9gldFEvDg4tc1whiNhxO9tEpA/exec?sheet=Summary%20Day"
+};
 
 // 🔥 helper ambil value (anti beda nama kolom)
 function getVal(obj, keys) {
@@ -2027,10 +3442,9 @@ function formatDate(val) {
   try {
     if (!val || val === "-") return "-";
 
-    // 🔥 ISO STRING (2026-03-31T17:00:00.000Z)
     if (typeof val === "string" && val.includes("T")) {
       const date = new Date(val);
-      if (isNaN(date)) return val; // fallback kalau gagal
+      if (isNaN(date)) return val;
 
       const wib = new Date(date.getTime() + 7 * 60 * 60 * 1000);
 
@@ -2041,14 +3455,12 @@ function formatDate(val) {
       });
     }
 
-    // 🔥 STRING BIASA (31-april-2026)
     if (typeof val === "string") {
       return val.replace(/-/g, " ").replace(/april/i, "April");
     }
 
-    // 🔥 OBJECT DATE
     const date = new Date(val);
-    if (isNaN(date)) return val; // fallback
+    if (isNaN(date)) return val;
 
     const wib = new Date(date.getTime() + 7 * 60 * 60 * 1000);
 
@@ -2059,11 +3471,14 @@ function formatDate(val) {
     });
   } catch (err) {
     console.error("FORMAT DATE ERROR:", val, err);
-    return val || "-"; // 🔥 jangan sampai crash
+    return val || "-";
   }
 }
 
-async function loadSummaryDay() {
+// =========================
+// 🔥 MAIN FUNCTION MULTI AREA
+// =========================
+async function loadSummaryDay(type = "jambi") {
   const thead = document.getElementById("summaryThead");
   const tbody = document.getElementById("summaryTableBody");
   const title = document.getElementById("summaryTitle");
@@ -2071,6 +3486,12 @@ async function loadSummaryDay() {
   tbody.innerHTML = `<tr><td colspan="12">⏳ Loading...</td></tr>`;
 
   try {
+    const SUMMARY_API = SUMMARY_API_MAP[type];
+
+    if (!SUMMARY_API) {
+      throw new Error("API tidak ditemukan: " + type);
+    }
+
     const res = await fetch(SUMMARY_API);
     const json = await res.json();
 
@@ -2091,22 +3512,29 @@ async function loadSummaryDay() {
       return;
     }
 
+    // =========================
+    // 🔥 HEADER TITLE DINAMIS
+    // =========================
+    let lokasi = "Jambi";
+    if (type === "rantau") lokasi = "Rantau";
+    if (type === "psu") lokasi = "PSU";
+
     let headerHTML = "";
 
     if (json.header && json.header.length > 0) {
       headerHTML = json.header.join("<br>");
     } else {
       headerHTML = `
-    SUMMARY OF CHARGE FOR SERVICE CHARGE <br>
-    PERTAMINA EP ASSET 1 JAMBI <br>
-    PERIODE
-  `;
+        SUMMARY OF CHARGE FOR SERVICE CHARGE <br>
+        PERTAMINA EP ASSET ${lokasi} <br>
+        PERIODE
+      `;
     }
 
     title.innerHTML = headerHTML;
 
     // =========================
-    // 🔥 HEADER TABLE
+    // 🔥 TABLE HEADER (TETAP)
     // =========================
     thead.innerHTML = `
       <tr>
@@ -2140,7 +3568,6 @@ async function loadSummaryDay() {
     data.forEach((item) => {
       const clean = normalizeKeys(item);
 
-      // 🔥 AUTO DETECT (ANTI GESER)
       const startRaw =
         clean["start"] ||
         clean["periodepemakaianstart"] ||
@@ -2165,13 +3592,14 @@ async function loadSummaryDay() {
           <td>${getVal(item, ["RFID"])}</td>
           <td>${getVal(item, ["FUEL STICK INDIKATOR/MONTH"])}</td>
           <td>${getVal(item, ["KOLOM TAMBAHAN"])}</td>
-        
+
           <td>${formatDate(startRaw)}</td>
           <td>${formatDate(endRaw)}</td>
 
           <td>${jumlahHari || "-"}</td>
         </tr>
       `;
+
       tbody.innerHTML += row;
     });
   } catch (err) {
@@ -2229,7 +3657,7 @@ function refreshSummary() {
   loadSummaryDay();
 }
 /* ===================== LOAD LAPORAN PEKERJAAN ===================== */
-const rowsPerPage = 50;
+const rowsPerPage = 100;
 let currentPage = 1;
 let allReportData = [];
 
@@ -2250,7 +3678,7 @@ async function loadReport() {
 
   try {
     const scriptURL =
-      "https://script.google.com/macros/s/AKfycbyb_FKT3APvJ6x3PEY6V2TO9OTwN5qpt1ZlX0BK2-t9jTYoSul0VyC3xqVq-ptBVzoXZQ/exec";
+      "https://script.google.com/macros/s/AKfycbzdMdw6ZNMoj1IimADGcl2mVf0WHCgx9dBOys5BFPfMt4th8NmsuLlbO2DeZYV1aaPxRQ/exec";
     const response = await fetch(scriptURL);
 
     if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
@@ -2391,20 +3819,53 @@ function setRadio(name, value) {
 }
 
 // ===================== DELETE ITEM =====================
-function deleteItem(jobNumber) {
+async function deleteItem(jobNumber) {
   if (!confirm("❗ Apakah Anda yakin ingin menghapus data ini?")) return;
 
-  allReportData = allReportData.filter(
-    (item) => item["Job Number"] !== jobNumber
-  );
+  try {
+    const scriptURL =
+      "https://script.google.com/macros/s/AKfycbzdMdw6ZNMoj1IimADGcl2mVf0WHCgx9dBOys5BFPfMt4th8NmsuLlbO2DeZYV1aaPxRQ/exec";
 
-  localStorage.setItem("reportData", JSON.stringify(allReportData));
+    const payload = {
+      _method: "DELETE",
+      jobNumber: jobNumber
+    };
 
-  renderReportTable();
+    const fd = new FormData();
+    fd.append("data", JSON.stringify(payload));
 
-  alert("✅ Data berhasil dihapus!");
+    const response = await fetch(scriptURL, {
+      method: "POST",
+      body: fd
+    });
+
+    const result = await response.json();
+
+    console.log("DELETE RESULT =", result);
+
+    if (result.status === "success") {
+      // hapus data lokal
+      allReportData = allReportData.filter(
+        item => String(item["Job Number"]).trim() !== String(jobNumber).trim()
+      );
+
+      localStorage.setItem(
+        "reportData",
+        JSON.stringify(allReportData)
+      );
+
+      renderReportTable();
+
+      alert("✅ Data berhasil dihapus permanen");
+    } else {
+      alert("❌ " + result.message);
+    }
+
+  } catch (err) {
+    console.error("DELETE ERROR =", err);
+    alert("❌ Gagal menghapus data");
+  }
 }
-
 // ===================== PAGINATION DENGAN ANGKA =====================
 function renderPaginationNumbers() {
   const totalPages = Math.ceil(allReportData.length / rowsPerPage);
@@ -2630,7 +4091,7 @@ async function loadPhotoReport() {
 
   try {
     const scriptURL =
-      "https://script.google.com/macros/s/AKfycbyb_FKT3APvJ6x3PEY6V2TO9OTwN5qpt1ZlX0BK2-t9jTYoSul0VyC3xqVq-ptBVzoXZQ/exec";
+      "https://script.google.com/macros/s/AKfycbzdMdw6ZNMoj1IimADGcl2mVf0WHCgx9dBOys5BFPfMt4th8NmsuLlbO2DeZYV1aaPxRQ/exec";
 
     console.log("📡 Fetching data from:", scriptURL);
     const response = await fetch(scriptURL);
@@ -3141,8 +4602,10 @@ function openDetail(item = {}) {
   <div>
     <h1>Indosat Ooredoo & Pertamina Jambi Project</h1>
     <h2>Laporan Pekerjaan (Job Report)</h2>
-    <p style="margin:3px 0; font-size:14px;">Alamat: Kenali Asam Atas, Kota Baru, Kota Jambi</p>
-    <p style="margin:3px 0; font-size:14px;">WhatsApp: DA. 0852-6762-7060 | Teknisi VTS 0895-3822-81515</p>
+    <p style="margin:3px 0; font-size:14px;">Alamat: Kantor Pusat PT Indosat (KPPTI) Lt. 18
+Jl. Medan Merdeka Barat No.21
+Daerah Khusus Ibukota Jakarta, 10110</p>
+    <p style="margin:3px 0; font-size:14px;">WhatsApp:ICT Service Indosat. +62 855-7556-677 | Teknisi VTS Jambi 0895-3822-81515 | Teknisi VTS Rantau 0852-7091-7992 | Teknisi VTS PSU 0813-9616-2656</p>
   </div>
 </div>
 
