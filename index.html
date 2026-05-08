@@ -31,7 +31,7 @@
 
       <div class="branding">
         <h1>EMD Jambi<br>
-          <span>Monitoring Job Report projeck Indosat & Pertamina Jambi</span>
+          <span>Monitoring Job Report project Indosat & Pertamina</span>
         </h1>
         <p>Smart Dashboard for Report & Maintenance EMD</p>
       </div>
@@ -73,7 +73,7 @@
   <header>
     <div class="header-container">
       <div class="header-text">
-        <h1>DASHBOARD PROGRES MNT VTS PERTAMINA JAMBI</h1>
+        <h1>DASHBOARD MAINTENANCE EOS & REPORT DA VTS PERTAMINA JAMBI.RANTAU.PANGSU</h1>
 
         <div class="header-links">
           <a href="javascript:void(0);" onclick="window.open('https://web.arvento.com/home.aspx', '_blank')">🌐 web Arvento </a>
@@ -121,15 +121,30 @@
     <button id="logoutBtn" onclick="logout()" class="logout-btn">Logout</button>
 
     <!-- Tombol Menu -->
-    <div class="menu-wrapper">
-      <button class="slide-btn" onclick="togglePanel()">▼ Progres Job Report EOS & DA</button>
-      <button class="slide-btn monitoring-btn" onclick="toggleMonitoringPanel()">▼ Monitoring VTS</button>
-    </div>
 
-    <!-- Panel Turun -->
+    <div class="menu-wrapper">
+
+      <button class="slide-btn" onclick="togglePanel(event)">
+        ▼ Progres Job Report EOS & DA
+      </button>
+
+      <button class="slide-btn monitoring-jambi" onclick="toggleMonitoringPanel('jambi', this, event)">
+        ▼ Monitoring VTS Pertamina Jambi
+      </button>
+
+      <button class="slide-btn monitoring-rantau" onclick="toggleMonitoringPanel('rantau', this, event)">
+        ▼ Monitoring VTS Pertamina Rantau
+      </button>
+
+      <button class="slide-btn monitoring-psu" onclick="toggleMonitoringPanel('psu', this, event)">
+        ▼ Monitoring VTS Pertamina PSU
+      </button>
+
+    </div>
+    <!-- ================= PANEL UTAMA ================= -->
     <div id="slidePanel" class="slide-panel">
       <a href="#" onclick="showLoaderAndRun(showForm)">
-        <img src="https://i.postimg.cc/DfWChsTR/pngtree-isometric-3d-illustration-cloud-technology-work-on-white-background-it-s-png-image-11560282.png" alt="icon" class="menu-icon">
+        <img src="https://i.postimg.cc/DfWChsTR/pngtree-isometric-3d-illustration-cloud-technology-work-on-white-background-it-s-png-image-11560282.png" class="menu-icon">
         Form Job Report
       </a>
 
@@ -139,12 +154,12 @@
       </a>
 
       <a href="#" onclick="showLoaderAndRun(showReport)">
-        <img src="https://i.postimg.cc/DfWChsTR/pngtree-isometric-3d-illustration-cloud-technology-work-on-white-background-it-s-png-image-11560282.png" alt="icon" class="menu-icon">
+        <img src="https://i.postimg.cc/DfWChsTR/pngtree-isometric-3d-illustration-cloud-technology-work-on-white-background-it-s-png-image-11560282.png" class="menu-icon">
         Laporan Pekerjaan
       </a>
 
       <a href="#" onclick="showLoaderAndRun(showPhotoReport)">
-        <img src="https://i.postimg.cc/DfWChsTR/pngtree-isometric-3d-illustration-cloud-technology-work-on-white-background-it-s-png-image-11560282.png" alt="icon" class="menu-icon">
+        <img src="https://i.postimg.cc/DfWChsTR/pngtree-isometric-3d-illustration-cloud-technology-work-on-white-background-it-s-png-image-11560282.png" class="menu-icon">
         Laporan Foto per Nomor Pekerjaan
       </a>
 
@@ -152,31 +167,65 @@
         <img src="https://i.postimg.cc/DfWChsTR/pngtree-isometric-3d-illustration-cloud-technology-work-on-white-background-it-s-png-image-11560282.png" class="menu-icon">
         Dashboard Maintenance
       </a>
-
     </div>
 
+    <!-- ================= PANEL JAMBI ================= -->
     <div id="monitoringPanel" class="slide-panel monitoring-panel">
       <a href="#" onclick="showLoaderAndRun(showVTS)">
-        <img src="https://i.postimg.cc/DfWChsTR/pngtree-isometric-3d-illustration-cloud-technology-work-on-white-background-it-s-png-image-11560282.png" class="menu-icon">
         Informasi VTS
       </a>
 
-      <a href="#" onclick="showLoaderAndRun(showMonitoringKontrak)">
-        <img src="https://i.postimg.cc/DfWChsTR/pngtree-isometric-3d-illustration-cloud-technology-work-on-white-background-it-s-png-image-11560282.png" class="menu-icon">
+      <a href="#" onclick="showLoaderAndRun(() => showMonitoringKontrak('jambi'))">
         Monitoring Harian VTS
       </a>
 
       <a href="#" onclick="showLoaderAndRun(showProgressReport)">
-        <img src="https://i.postimg.cc/DfWChsTR/pngtree-isometric-3d-illustration-cloud-technology-work-on-white-background-it-s-png-image-11560282.png" class="menu-icon">
         Progress Report VTS
       </a>
 
       <a href="#" onclick="showLoaderAndRun(showSummaryDayVTS)">
-        <img src="https://i.postimg.cc/DfWChsTR/pngtree-isometric-3d-illustration-cloud-technology-work-on-white-background-it-s-png-image-11560282.png" class="menu-icon">
         Summary Day VTS
       </a>
-
     </div>
+
+    <!-- ================= PANEL RANTAU ================= -->
+    <div id="monitoringPanelRantau" class="slide-panel monitoring-panel">
+      <a href="#" onclick="showLoaderAndRun(showVTSRantau)">
+        Informasi VTS Rantau
+      </a>
+
+      <a href="#" onclick="showLoaderAndRun(() => showMonitoringKontrak('rantau'))">
+        Monitoring Harian VTS Rantau
+      </a>
+
+      <a href="#" onclick="showLoaderAndRun(() => showProgressReport('rantau'))">
+        Progress Report VTS Rantau
+      </a>
+
+      <a href="#" onclick="showLoaderAndRun(() => showSummaryDayVTS('rantau'))">
+        Summary Day VTS Rantau
+      </a>
+    </div>
+
+    <!-- ================= PANEL PSU ================= -->
+    <div id="monitoringPanelPSU" class="slide-panel monitoring-panel">
+      <a href="#" onclick="showLoaderAndRun(showVTSPSU)">
+        Informasi VTS PSU
+      </a>
+
+      <a href="#" onclick="showLoaderAndRun(() => showMonitoringKontrak('psu'))">
+        Monitoring Harian VTS PSU
+      </a>
+
+      <a href="#" onclick="showLoaderAndRun(() => showProgressReport('psu'))">
+        Progress Report VTS PSU
+      </a>
+
+      <a href="#" onclick="showLoaderAndRun(() => showSummaryDayVTS('psu'))">
+        Summary Day VTS PSU
+      </a>
+    </div>
+
   </header>
 
   <!-- Loader -->
@@ -185,18 +234,20 @@
     <p>Memuat data, harap tunggu...</p>
   </div>
 
-  <main>
+ <main>
+
+  <!-- 🔥 WRAPPER FLEX -->
+  <div class="layout-dual">
+
+    <!-- KIRI: SEMUA ISI KAMU SEKARANG -->
+    <div class="form-area">
 
     <!-- NOMOR PEKERJAAN -->
     <div class="job-number" style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
       <button class="btn" onclick="generateJobNumber()">🔢 Generate Job Number</button>
 
       <strong>No. Pekerjaan:</strong>
-      <span 
-  id="jobNumber" 
-  contenteditable="true"
-  style="font-weight: bold; font-size: 1.2em; color: #1e3a8a; border-bottom: 1px dashed #999; padding: 2px 6px;"
->...</span>
+      <span id="jobNumber" contenteditable="true" style="font-weight: bold; font-size: 1.2em; color: #1e3a8a; border-bottom: 1px dashed #999; padding: 2px 6px;">...</span>
       <p id="current-date" class="header-date"></p>
     </div>
     <!-- ======= WIZARD STEPS INDICATOR ======= -->
@@ -233,7 +284,12 @@
         <div class="grid-3">
           <div>
             <label for="user">User Name</label>
-            <input type="text" id="user" placeholder="Masukkan nama user">
+            <select id="user">
+              <option value="">Pilih</option>
+              <option>PT.PERTAMINA ASSET 1 FIELD JAMBI</option>
+              <option>PT.PERTAMINA ASSET 1 FIELD RANTAU</option>
+              <option>PT.PERTAMINA ASSET 1 FIELD PANGKALAN SUSU</option>
+            </select>
           </div>
           <div>
             <label for="workingType">Working Type</label>
@@ -253,9 +309,13 @@
             <label for="installationType">Installation Type</label>
             <select id="installationType">
               <option value="">Pilih</option>
-              <option>GPS Unit</option>
+              <option>GPS Unit</option>           
               <option>RFID</option>
               <option>Fuel Stick</option>
+              <option>Buzzer</option>           
+              <option>Bypass</option>
+              <option>MDVR</option>
+              <option>Camera MDVR</option>
               <option>Non instalation</option>
             </select>
           </div>
@@ -273,7 +333,7 @@
 
           <div>
             <label>Merk Kendaraan</label>
-            <select id="merkKendaraan">
+              <select id="merkKendaraan">
               <option value="">-- Pilih Kendaraan --</option>
               <option value="Mitsubishi Pajero">Mitsubishi Pajero</option>
               <option value="Mitsubishi Triton Doble Cabin">Mitsubishi Triton</option>
@@ -283,6 +343,14 @@
               <option value="HINO FM 280JD">HINO FM 280JD</option>
               <option value="Toyota Inova">Toyota Inova</option>
               <option value="Toyota Hiace">Toyota Hiace</option>
+              <option value="Toyota Fortuner">Toyota Fortuner</option>
+              <option value="Honda">Honda</option>
+              <option value="Isuzu">Isuzu</option>
+              <option value="Mitsubishi">Mitsubishi</option>
+              <option value="Toyota">Toyota</option>
+              <option value="Komatsu">Komatsu</option>
+              <option value="Sany">Sany</option>
+              <option value="UD Quester">UD Quester</option>  
             </select>
           </div>
           <div>
@@ -292,8 +360,23 @@
               <option value="Doble cabin">Doble cabin</option>
               <option value="Single cabin">Single cabin</option>
               <option value="SUV">SUV</option>
+              <option value="MPV">MPV</option>
               <option value="Vacum truck">Vacum truck</option>
-              <option Value="Mini bus">Mini bus</option>
+              <option value="Dump truck">Dump truck</option>
+              <option Value="Micro bus">Micro bus</option>
+              <option Value="Speed Boat">Speed Boat</option>
+              <option value="Mobil Pemadam">Mobil Pemadam</option>
+              <option value="MotorCross">MotorCross</option>
+              <option value="Tug Boat Arlin">Tug Boat Arlin</option>
+              <option value="Truck Lowbed">Truck Lowbed</option>
+              <option value="Truck Crane">Truck Crane</option>
+              <option value="Picker">Picker</option>
+              <option value="Motor Grader">Motor Grader</option>
+              <option value="Excavator">Excavator</option>
+              <option value="Road Roller">Road Roller</option>
+              <option value="Truck tronton">Truck tronton</option>
+              <option value="Crane">Crane</option>
+              
             </select>
           </div>
           <div>
@@ -464,7 +547,164 @@
                 <option>VT-081 BH 8803 YV</option>
               </optgroup>
 
+              <optgroup label="RANTAU">
+                <option>RTU 01 (BL 1418 UU)</option>
+                <option>RTU 02 (BL 1442 UU)</option>
+                <option>RTU 03 (BL 1419 UU)</option>
+                <option>RTU 04 (BL 1458 UU)</option>
+                <option>RTU 05 (BL 1439 UU)</option>
+                <option>RTU 06 (BL 1435 UU)</option>
+                <option>RTU 07 (BL 1438 UU)</option>
+                <option>RTU 08 (BL 1434 UU)</option>
+                <option>RTU 09 (BL 1432 UU)</option>
+                <option>RTU 10 (BL 1426 UU)</option>
+                <option>RTU 11 (BL 1429 UU)</option>
+                <option>RTU 12 (BL 1412 UC)</option>
+                <option>RTU 13 (BL 1421 UU)</option>
+                <option>RTU 14 (BL 1420 UU)</option>
+                <option>RTU 15 (BL 8299 UC)</option>
+                <option>RTU 16 (BL 8309 UC)</option>
+                <option>RTU 17 (BL 8306 UC)</option>
+                <option>RTU 18 (BL 8310 UC)</option>
+                <option>RTU 19 (BL 8166 FC)</option>
+                <option>RTU 20 (BL 8293 UC)</option>
+                <option>RTU 21 (BL 8302 UC)</option>
+                <option>RTU 22 (BL 8301 UC)</option>
+                <option>RTU 23 (BL 8296 UC)</option>
+                <option>RTU 24 (BL 8312 UC)</option>
+                <option>RTU 25 (BL 8291 UC)</option>
+                <option>RTU 26 (BL 8308 UC)</option>
+                <option>RTU 27 (BL 8307 UC)</option>
+                <option>RTU 28 (BL 8292 UC)</option>
+                <option>RTU 29 (BL 8259 UC)</option>
+                <option>RTU 30 (BL 8260 UC)</option>
+                <option>RTU 31 (BL 8284 UC)</option>
+                <option>RTU 32 (BL 8250 UC)</option>
+                <option>RTU 33 (BL 8252 UC)</option>
+                <option>RTU 34 (BL 8257 UC)</option>
+                <option>RTU 35 (BL 8253 UC)</option>
+                <option>RTU 36 (BL 8256 UC)</option>
+                <option>RTU 37 (BL 8251 UC)</option>
+                <option>RTU 38 (BL 8254 UC)</option>
+                <option>RTU 39 (BL 8305 UC)</option>
+                <option>RTU 40 (BL 8304 UC)</option>
+                <option>RTU 41 (BL 8303 UC)</option>
+                <option>RTU 42 (BL 8294 UC)</option>
+                <option>RTU 43 (BL 8295 UC)</option>
+                <option>RTU 44 (BL 8298 UC)</option>
+                <option>RTU 45 (BL 1462 UU)</option>
+                <option>RTU 46 (BL 1675 UU)</option>
+                <option>RTU 47 (BL 1466 UU)</option>
+                <option>RTU 48 (BL 1461 UU)</option>
+                <option>RTU 49 (BL 1465 UU)</option>
+                <option>RTU 50 (BL 8221 UC)</option>
+                <option>AB 01 (B 9122 XEY)</option>
+                <option>AB 02 (B 9131 XEY)</option>
+                <option>PICKER AB 03 (BK 8154 FX)</option>
+                <option>PICKER AB 04 (BK 8153 FX)</option>
+                <option>PICKER AB 05 (BK 8155 FX)</option>
+                <option>TRONTON AB 06 (BH 4679 XX)</option>
+                <option>TRONTON AB 07 (BH 7845 XX)</option>
+                <option>TRAILLER AB.08 (BK 8834 FV)</option>
+                <option>TRUCK AB 09 (BK 8086 PB)</option>
+                <option>V 01 (B 9766 UFV)</option>
+                <option>V 02 (B 9763 UFV)</option>
+                <option>V 03 (B 9767 UFV)</option>
+                <option>V 04 (B 9769 UFV)</option>
+                <option>V 05 (B 9764 UFV)</option>
+                <option>V 06 (B 9768 UFV)</option>
+                <option>V 07 (B 9765 UFV)</option>
+                <option>VACT-173 (BL 3405 UA)</option>
+                <option>DT 59</option>
+                <option>DT 60</option>
+                <option>MRG 27</option>
+                <option>RRM 20</option>
+                <option>SMT 48</option>
+                <option>SMT 49</option>
+                <option>SMT 50</option>
+              </optgroup>
+              <optgroup label="PSU">
+                <<option>BK 1076 PZ</option>
+                  <option>BK 1077 PZ</option>
+                  <option>BK 1078 PZ</option>
+                  <option>BK 1079 PZ</option>
+                  <option>BK 1080 PZ</option>
+                  <option>BK 1096 PZ</option>
+                  <option>BK 1103 PZ</option>
+                  <option>BK 1135 PZ</option>
+                  <option>BK 1145 PZ</option>
+                  <option>BK 1152 PZ</option>
+                  <option>BK 1161 PZ</option>
+                  <option>BK 1162 PZ</option>
+                  <option>BK 1163 PZ</option>
+                  <option>BK 1164 PZ</option>
+                  <option>BK 1197 PZ</option>
+                  <option>BK 1209 PZ</option>
+                  <option>BK 2637 PBQ</option>
+                  <option>BK 2638 PBQ</option>
+                  <option>BK 3108 PBQ</option>
+                  <option>BK 3110 PBQ</option>
+                  <option>BK 3113 PBQ</option>
+                  <option>BK 3137 PBQ</option>
+                  <option>BK 3141 BPQ</option>
+                  <option>BK 7716 PK</option>
+                  <option>BK 7717 PK</option>
+                  <option>BK 8083 PB</option>
+                  <option>BK 8097 PB</option>
+                  <option>BK 8125 LP</option>
+                  <option>BK 8144 PI</option>
+                  <option>BK 8233 PM</option>
+                  <option>BK 8234 PM</option>
+                  <option>BK 8235 PM</option>
+                  <option>BK 8337 AX</option>
+                  <option>BK 8434 PK</option>
+                  <option>BK 8682 XP</option>
+                  <option>BK 8714 PJ</option>
+                  <option>BK 8761 GY</option>
+                  <option>BK 8762 GY</option>
+                  <option>BK 8763 GY</option>
+                  <option>BK 8764 GY</option>
+                  <option>BK 8765 GY</option>
+                  <option>BK 8767 GY</option>
+                  <option>BK 8768 GY</option>
+                  <option>BK 8769 GY</option>
+                  <option>BK 8770 GY</option>
+                  <option>BK 8915 PN</option>
+                  <option>BK 8916 PN</option>
+                  <option>BK 8919 PN</option>
+                  <option>BK 8923 PN</option>
+                  <option>BK 8924 PN</option>
+                  <option>BK 8925 PN</option>
+                  <option>BK 8926 PN</option>
+                  <option>BK 8927 PN</option>
+                  <option>BK 8931 PN</option>
+                  <option>BK 8932 PN</option>
+                  <option>BK 8933 PN</option>
+                  <option>BK 8934 PN</option>
+                  <option>BK 8935 PN</option>
+                  <option>BK 8936 PN</option>
+                  <option>BK 8938 PN</option>
+                  <option>BK 8950 PN</option>
+                  <option>BK 8951 PN</option>
+                  <option>BK 8952 PN</option>
+                  <option>BK 8953 PN</option>
+                  <option>BK 8961 PI</option>
+                  <option>BK 8965 PB</option>
+                  <option>BK 9015 PB</option>
+                  <option>BK 9083 PI</option>
+                  <option>BK 9736 H</option>
+                  <option>BK1209PZ</option>
+                  <option>BL 8418 UA</option>
+                  <option>LCT</option>
+                  <option>PSB 01</option>
+                  <option>SPEED TELUK ARU 1</option>
+                  <option>TEST DRIVE</option>
+                  <option>TUG BOAT ARLIN</option>
+
+              </optgroup>
+
             </select>
+
           </div>
 
           <div>
@@ -673,9 +913,12 @@
               <option value="">-- Pilih Warna --</option>
 
               <option value="Putih">Putih</option>
+              <option value="Putih list merah">Putih list merah</option>
+              <option value="Putih list kuning">Putih list kuning</option>
               <option value="Hitam">Hitam</option>
               <option value="Kuning">Kuning</option>
               <option value="Biru">Biru</option>
+              <option value="Silver">Silver</option>
 
             </select>
           </div>
@@ -932,7 +1175,18 @@
       </div>
 
     </form>
-  </main>
+  
+   </div>
+
+   <aside id="onlineSidebar" class="online-area">
+  <div class="online-head">
+    <span>🟢 USER ONLINE</span>
+    <span id="onlineCount">0</span>
+  </div>
+
+  <div id="onlineUsers"></div>
+</aside>
+</main>
 
   <!-- 🔄 LOADER OVERLAY -->
   <div id="loaderOverlay" style="
@@ -1000,30 +1254,6 @@
             </button>
           </div>
         </div>
-      </div>
-      <!-- 🖼️ GAMBAR PEMISAH / HEADER DI ATAS TABEL -->
-      <div style="text-align:center; margin:25px 0;">
-        <img src="https://i.postimg.cc/4xg1S8k7/creno.png" alt="Header Report Image" style="
-      max-width:280px;   /* 🔹 ukuran sedang */
-      width:60%;         /* responsif, tidak penuh */
-      height:auto;
-      object-fit:contain;
-      filter:drop-shadow(0 3px 6px rgba(0,0,0,0.3));
-      opacity:0.97;
-      transition:transform 0.3s ease;
-    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-      </div>
-      <!-- 🖼️ GAMBAR PEMISAH / HEADER DI ATAS TABEL -->
-      <div style="text-align:center; margin:25px 0;">
-        <img src="https://i.postimg.cc/4xg1S8k7/creno.png" alt="Header Report Image" style="
-      max-width:280px;   /* 🔹 ukuran sedang */
-      width:60%;         /* responsif, tidak penuh */
-      height:auto;
-      object-fit:contain;
-      filter:drop-shadow(0 3px 6px rgba(0,0,0,0.3));
-      opacity:0.97;
-      transition:transform 0.3s ease;
-    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
       </div>
 
       <!-- 🎯 TOMBOL AKSI DI SEBELAH KANAN -->
@@ -1130,6 +1360,74 @@
 
     <div class="table-responsive">
       <table id="vtsTable">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Node</th>
+            <th>License Plate</th>
+            <th>Jenis Kendaraan</th>
+            <th>IMEI</th>
+            <th>GSM</th>
+            <th>Status VTS</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+  </section>
+
+  <!-- ====== PANEL INFORMASI VTS RANTAU ====== -->
+  <section id="vtsSectionRantau" class="report-section" style="display:none;">
+
+    <h1>Informasi VTS Pertamina Rantau PO:74 Unit</h1>
+
+    <div style="margin-bottom:15px;">
+      <input type="text" id="searchVTSRantau" placeholder="Cari Plat / IMEI..." onkeyup="filterVTSRantau()" style="padding:8px; width:250px; border:1px solid #ccc; border-radius:5px;">
+
+      <button onclick="loadVTSRantau()" style="
+      background:#2563eb;color:white;border:none;
+      padding:8px 12px;border-radius:5px;cursor:pointer;">
+        🔄 Muat Ulang
+      </button>
+    </div>
+
+    <div class="table-responsive">
+      <table id="vtsTableRantau">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Node</th>
+            <th>License Plate</th>
+            <th>Jenis Kendaraan</th>
+            <th>IMEI</th>
+            <th>GSM</th>
+            <th>Status VTS</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+  </section>
+
+  <!-- ====== PANEL INFORMASI VTS PSU ====== -->
+  <section id="vtsSectionPSU" class="report-section" style="display:none;">
+
+    <h1>Informasi VTS Pertamina PSU PO:70 Unit</h1>
+
+    <div style="margin-bottom:15px;">
+      <input type="text" id="searchVTSPsu" placeholder="Cari Plat / IMEI..." onkeyup="filterVTSPsu()" style="padding:8px; width:250px; border:1px solid #ccc; border-radius:5px;">
+
+      <button onclick="loadVTSPsu()" style="
+      background:#2563eb;color:white;border:none;
+      padding:8px 12px;border-radius:5px;cursor:pointer;">
+        🔄 Muat Ulang
+      </button>
+    </div>
+
+    <div class="table-responsive">
+      <table id="vtsTablePSU">
         <thead>
           <tr>
             <th>No</th>
@@ -1304,6 +1602,159 @@
 
         <option value="VT-075|BH 8129 YW">VT-075 | BH 8129 YW</option>
         <option value="VT-081|BH 8803 YV">VT-081 | BH 8803 YV</option>
+
+        <option value="RTU 01 | BL 1418 UU">RTU 01 | BL 1418 UU</option>
+        <option value="RTU 02 | BL 1442 UU">RTU 02 | BL 1442 UU</option>
+        <option value="RTU 03 | BL 1419 UU">RTU 03 | BL 1419 UU</option>
+        <option value="RTU 04 | BL 1458 UU">RTU 04 | BL 1458 UU</option>
+        <option value="RTU 05 | BL 1439 UU">RTU 05 | BL 1439 UU</option>
+        <option value="RTU 06 | BL 1435 UU">RTU 06 | BL 1435 UU</option>
+        <option value="RTU 07 | BL 1438 UU">RTU 07 | BL 1438 UU</option>
+        <option value="RTU 08 | BL 1434 UU">RTU 08 | BL 1434 UU</option>
+        <option value="RTU 09 | BL 1432 UU">RTU 09 | BL 1432 UU</option>
+        <option value="RTU 10 | BL 1426 UU">RTU 10 | BL 1426 UU</option>
+        <option value="RTU 11 | BL 1429 UU">RTU 11 | BL 1429 UU</option>
+        <option value="RTU 12 | BL 1412 UC">RTU 12 | BL 1412 UC</option>
+        <option value="RTU 13 | BL 1421 UU">RTU 13 | BL 1421 UU</option>
+        <option value="RTU 14 | BL 1420 UU">RTU 14 | BL 1420 UU</option>
+        <option value="RTU 15 | BL 8299 UC">RTU 15 | BL 8299 UC</option>
+        <option value="RTU 16 | BL 8309 UC">RTU 16 | BL 8309 UC</option>
+        <option value="RTU 17 | BL 8306 UC">RTU 17 | BL 8306 UC</option>
+        <option value="RTU 18 | BL 8310 UC">RTU 18 | BL 8310 UC</option>
+        <option value="RTU 19 | BL 8166 FC">RTU 19 | BL 8166 FC</option>
+        <option value="RTU 20 | BL 8293 UC">RTU 20 | BL 8293 UC</option>
+        <option value="RTU 21 | BL 8302 UC">RTU 21 | BL 8302 UC</option>
+        <option value="RTU 22 | BL 8301 UC">RTU 22 | BL 8301 UC</option>
+        <option value="RTU 23 | BL 8296 UC">RTU 23 | BL 8296 UC</option>
+        <option value="RTU 24 | BL 8312 UC">RTU 24 | BL 8312 UC</option>
+        <option value="RTU 25 | BL 8291 UC">RTU 25 | BL 8291 UC</option>
+        <option value="RTU 26 | BL 8308 UC">RTU 26 | BL 8308 UC</option>
+        <option value="RTU 27 | BL 8307 UC">RTU 27 | BL 8307 UC</option>
+        <option value="RTU 28 | BL 8292 UC">RTU 28 | BL 8292 UC</option>
+        <option value="RTU 29 | BL 8259 UC">RTU 29 | BL 8259 UC</option>
+        <option value="RTU 30 | BL 8260 UC">RTU 30 | BL 8260 UC</option>
+        <option value="RTU 31 | BL 8284 UC">RTU 31 | BL 8284 UC</option>
+        <option value="RTU 32 | BL 8250 UC">RTU 32 | BL 8250 UC</option>
+        <option value="RTU 33 | BL 8252 UC">RTU 33 | BL 8252 UC</option>
+        <option value="RTU 34 | BL 8257 UC">RTU 34 | BL 8257 UC</option>
+        <option value="RTU 35 | BL 8253 UC">RTU 35 | BL 8253 UC</option>
+        <option value="RTU 36 | BL 8256 UC">RTU 36 | BL 8256 UC</option>
+        <option value="RTU 37 | BL 8251 UC">RTU 37 | BL 8251 UC</option>
+        <option value="RTU 38 | BL 8254 UC">RTU 38 | BL 8254 UC</option>
+        <option value="RTU 39 | BL 8305 UC">RTU 39 | BL 8305 UC</option>
+        <option value="RTU 40 | BL 8304 UC">RTU 40 | BL 8304 UC</option>
+        <option value="RTU 41 | BL 8303 UC">RTU 41 | BL 8303 UC</option>
+        <option value="RTU 42 | BL 8294 UC">RTU 42 | BL 8294 UC</option>
+        <option value="RTU 43 | BL 8295 UC">RTU 43 | BL 8295 UC</option>
+        <option value="RTU 44 | BL 8298 UC">RTU 44 | BL 8298 UC</option>
+        <option value="RTU 45 | BL 1462 UU">RTU 45 | BL 1462 UU</option>
+        <option value="RTU 46 | BL 1675 UU">RTU 46 | BL 1675 UU</option>
+        <option value="RTU 47 | BL 1466 UU">RTU 47 | BL 1466 UU</option>
+        <option value="RTU 48 | BL 1461 UU">RTU 48 | BL 1461 UU</option>
+        <option value="RTU 49 | BL 1465 UU">RTU 49 | BL 1465 UU</option>
+        <option value="RTU 50 | BL 8221 UC">RTU 50 | BL 8221 UC</option>
+        <option value="AB 01 | B 9122 XEY">AB 01 | B 9122 XEY</option>
+        <option value="AB 02 | B 9131 XEY">AB 02 | B 9131 XEY</option>
+        <option value="PICKERAB 03 | BK 8154 FX">PICKERAB 03 | BK 8154 FX</option>
+        <option value="PICKERAB 04 | BK 8153 FX">PICKERAB 04 | BK 8153 FX</option>
+        <option value="PICKER AB 05 | BK 8155 FX">PICKER AB 05 | BK 8155 FX</option>
+        <option value="TRONTON AB 06 | BH 4679 XX">TRONTON AB 06 | BH 4679 XX</option>
+        <option value="TRONTON AB 07 | BH 7845 XX">TRONTON AB 07 | BH 7845 XX</option>
+        <option value="TRAILLER AB.08 | BK 8834 FV">TRAILLER AB.08 | BK 8834 FV</option>
+        <option value="TRUCK AB 09 |BK 8086 PB">TRUCK AB 09 |BK 8086 PB</option>
+        <option value="V 01 | B 9766 UFV">V 01 | B 9766 UFV</option>
+        <option value="V 02 | B 9763 UFV">V 02 | B 9763 UFV</option>
+        <option value="V 03 | B 9767 UFV">V 03 | B 9767 UFV</option>
+        <option value="V 04 | B 9769 UFV">V 04 | B 9769 UFV</option>
+        <option value="V 05 | B 9764 UFV">V 05 | B 9764 UFV</option>
+        <option value="V 06 | B 9768 UFV">V 06 | B 9768 UFV</option>
+        <option value="V 07 | B 9765 UFV">V 07 | B 9765 UFV</option>
+        <option value="VACT-173 | BL 3405 UA">VACT-173 | BL 3405 UA</option>
+        <option value="DT 59 | DT 59">DT 59 | DT 59</option>
+        <option value="DT 60 | DT 60">DT 60 | DT 60</option>
+        <option value="MRG 27 | MRG 27">MRG 27 | MRG 27</option>
+        <option value="RRM 20 | RRM 20">RRM 20 | RRM 20</option>
+        <option value="SMT 48 | SMT 48">SMT 48 | SMT 48</option>
+        <option value="SMT 49 | SMT 49">SMT 49 | SMT 49</option>
+        <option value="SMT 50 | SMT 50">SMT 50 | SMT 50</option>
+
+        <option value="BK 1076 PZ | BK 1076 PZ">BK 1076 PZ | BK 1076 PZ</option>
+        <option value="BK 1077 PZ | BK 1077 PZ">BK 1077 PZ | BK 1077 PZ</option>
+        <option value="BK 1078 PZ | BK 1078 PZ">BK 1078 PZ | BK 1078 PZ</option>
+        <option value="BK 1079 PZ | BK 1079 PZ">BK 1079 PZ | BK 1079 PZ</option>
+        <option value="BK 1080 PZ | BK 1080 PZ">BK 1080 PZ | BK 1080 PZ</option>
+        <option value="BK 1096 PZ | BK 1096 PZ">BK 1096 PZ | BK 1096 PZ</option>
+        <option value="BK 1103 PZ | BK 1103 PZ">BK 1103 PZ | BK 1103 PZ</option>
+        <option value="BK 1135 PZ | BK 1135 PZ">BK 1135 PZ | BK 1135 PZ</option>
+        <option value="BK 1145 PZ | BK 1145 PZ">BK 1145 PZ | BK 1145 PZ</option>
+        <option value="BK 1152 PZ | BK 1152 PZ">BK 1152 PZ | BK 1152 PZ</option>
+        <option value="BK 1161 PZ | BK 1161 PZ">BK 1161 PZ | BK 1161 PZ</option>
+        <option value="BK 1162 PZ | BL 1412 UC">BK 1162 PZ | BL 1412 UC</option>
+        <option value="BK 1163 PZ | BK 1163 PZ">BK 1163 PZ | BK 1163 PZ</option>
+        <option value="BK 1164 PZ | BL 1420 UU">BK 1164 PZ | BL 1420 UU</option>
+        <option value="BK 1197 PZ | BK 1197 PZ">"BK 1197 PZ | BK 1197 PZ</option>
+        <option value="BK 1209 PZ | BK 1209 PZ">BK 1209 PZ | BK 1209 PZ</option>
+        <option value="BK 2637 PBQ | BK 2637 PBQ">BK 2637 PBQ | BK 2637 PBQ</option>
+        <option value="BK 2638 PBQ | BK 2638 PBQ">BK 2638 PBQ | BK 2638 PBQ</option>
+        <option value="BK 3108 PBQ | BK 3108 PBQ">BK 3108 PBQ | BK 3108 PBQ</option>
+        <option value="BK 3110 PBQ | BK 3110 PBQ">BK 3110 PBQ | BK 3110 PBQ</option>
+        <option value="BK 3113 PBQ | BK 3113 PBQ">BK 3113 PBQ | BK 3113 PBQ</option>
+        <option value="BK 3137 PBQ | BK 3137 PBQ">BK 3137 PBQ | BK 3137 PBQ</option>
+        <option value="BK 3141 BPQ | BK 3141 BPQ">BK 3141 BPQ | BK 3141 BPQ</option>
+        <option value="BK 7716 PK | BK 7716 PK">BK 7716 PK | BK 7716 PK</option>
+        <option value="BK 7717 PK | BK 7717 PK">BK 7717 PK | BK 7717 PK</option>
+        <option value="BK 8083 PB | BK 8083 PB">BK 8083 PB | BK 8083 PB</option>
+        <option value="BK 8097 PB | BK 8097 PB">BK 8097 PB | BK 8097 PB</option>
+        <option value="BK 8125 LP | BK 8125 LP">BK 8125 LP | BK 8125 LP</option>
+        <option value="BK 8144 PI | BK 8144 PI">BK 8144 PI | BK 8144 PI</option>
+        <option value="BK 8233 PM | BK 8233 PM">BK 8233 PM | BK 8233 PM</option>
+        <option value="BK 8234 PM | BK 8234 PM">BK 8234 PM | BK 8234 PM</option>
+        <option value="BK 8235 PM | BK 8235 PM">BK 8235 PM | BK 8235 PM</option>
+        <option value="BK 8337 AX | BK 8337 AX">BK 8337 AX | BK 8337 AX</option>
+        <option value="BK 8434 PK | BK 8434 PK">BK 8434 PK | BK 8434 PK</option>
+        <option value="BK 8682 XP | BK 8682 XP">BK 8682 XP | BK 8682 XP</option>
+        <option value="BK 8714 PJ | BK 8714 PJ">BK 8714 PJ | BK 8714 PJ</option>
+        <option value="BK 8761 GY | BK 8761 GY">BK 8761 GY | BK 8761 GY</option>
+        <option value="BK 8762 GY | BK 8762 GY">BK 8762 GY | BK 8762 GY</option>
+        <option value="BK 8763 GY | BK 8763 GY">BK 8763 GY | BK 8763 GY</option>
+        <option value="BK 8764 GY | BK 8764 GY">BK 8764 GY | BK 8764 GY</option>
+        <option value="BK 8765 GY | BK 8765 GY">BK 8765 GY | BK 8765 GY</option>
+        <option value="BK 8767 GY | BK 8767 GY">BK 8767 GY | BK 8767 GY</option>
+        <option value="BK 8768 GY | BK 8768 GY">BK 8768 GY | BK 8768 GY</option>
+        <option value="BK 8769 GY | BK 8769 GY">BK 8769 GY | BK 8769 GY</option>
+        <option value="BK 8770 GY | BK 8770 GY">BK 8770 GY | BK 8770 GY</option>
+        <option value="BK 8915 PN | BK 8915 PN">BK 8915 PN | BK 8915 PN</option>
+        <option value="BK 8916 PN | BK 8916 PN">BK 8916 PN | BK 8916 PN</option>
+        <option value="BK 8919 PN | BK 8919 PN">BK 8919 PN | BK 8919 PN</option>
+        <option value="BK 8923 PN | BK 8923 PN">BK 8923 PN | BK 8923 PN</option>
+        <option value="BK 8924 PN | BK 8924 PN">BK 8924 PN | BK 8924 PN</option>
+        <option value="BK 8925 PN | BK 8925 PN">ABK 8925 PN | BK 8925 PN</option>
+        <option value="BK 8926 PN | BK 8926 PN">BK 8926 PN | BK 8926 PN</option>
+        <option value="BK 8927 PN | BK 8927 PN">BK 8927 PN | BK 8927 PN</option>
+        <option value="BK 8931 PN | BK 8931 PN">BK 8931 PN | BK 8931 PN</option>
+        <option value="BK 8932 PN | BK 8932 PN">BK 8932 PN | BK 8932 PN</option>
+        <option value="BK 8933 PN | BK 8933 PN">BK 8933 PN | BK 8933 PN</option>
+        <option value="BK 8934 PN | BK 8934 PN">BK 8934 PN | BK 8934 PN</option>
+        <option value="BK 8935 PN | BK 8935 PN">BK 8935 PN | BK 8935 PN</option>
+        <option value="BK 8936 PN | BK 8936 PN">BK 8936 PN | BK 8936 PN</option>
+        <option value="BK 8938 PN | BK 8938 PN">BK 8938 PN | BK 8938 PN</option>
+        <option value="BK 8950 PN | BK 8950 PN">BK 8950 PN | BK 8950 PN</option>
+        <option value="BK 8951 PN | BK 8951 PN">BK 8951 PN | BK 8951 PN</option>
+        <option value="BK 8952 PN | BK 8952 PN">BK 8952 PN | BK 8952 PN</option>
+        <option value="BK 8953 PN | BK 8953 PN">BK 8953 PN | BK 8953 PN</option>
+        <option value="BK 8961 PI | BK 8961 PI">BK 8961 PI | BK 8961 PI</option>
+        <option value="BK 8965 PB | BK 8965 PB">BK 8965 PB | BK 8965 PB</option>
+        <option value="BK 9015 PB | BK 9015 PB">BK 9015 PB | BK 9015 PB</option>
+        <option value="BK 9083 PI | BK 9083 PI">BK 9083 PI | BK 9083 PI</option>
+        <option value="BK 9736 H | BK 9736 H">BK 9736 H | BK 9736 H</option>
+        <option value="BK 1209 PZ | BK 1209 PZ">BK 1209 PZ | BK 1209 PZ</option>
+        <option value="BL 8418 UA | BL 8418 UA">BL 8418 UA | BL 8418 UA</option>
+        <option value="LCT | LCT">LCT | LCT</option>
+        <option value="PSB 01 | PSB 01">PSB 01 | PSB 01</option>
+        <option value="SPEED TELUK ARU 1 | SPEED TELUK ARU 1">SMT 50 | SMT 50</option>
+        <option value="TEST DRIVE | TEST DRIVE">TEST DRIVE | TEST DRIVE</option>
+        <option value="TUG BOAT ARLIN | TUG BOAT ARLIN">TUG BOAT ARLIN | TUG BOAT ARLIN</option>
+
         < </select>
           <input type="text" id="cekIMEI" placeholder="IMEI">
           <input type="text" id="cekIMSI" placeholder="IMSI">
@@ -1345,7 +1796,7 @@
     </div>
 
     <button onclick="submitCekRutin()" class="btn"> Simpan</button>
-    <button onclick="loadCekRutinReport()" class="btn">📊 Report Cek Rutin</button>
+    <button onclick="loadCekRutinReport()" class="btn"> Report Cek Rutin</button>
 
   </section>
   <section id="reportCekRutinSection" class="report-section" style="display:none;">
@@ -1377,7 +1828,7 @@
 
   <section id="dashboardSection" class="report-section" style="display:none;">
 
-    <h1 style="margin-bottom:10px;">Dashboard Maintenance</h1>
+    <h1 style="margin-bottom:10px;">Chart Maintenance</h1>
 
     <!-- ================= KPI ================= -->
     <div class="kpi-container">
@@ -1429,14 +1880,21 @@
 
     <!-- ================= CHART ================= -->
     <div class="chart-box">
+      <div class="chart-header">
+        <h3> Maintenance Analytics VTS PT.Pertamina EP Asset 1</h3>
+        <p>Monitoring status Maintenance VTS</p>
+      </div>
+
       <canvas id="chartMaintenance"></canvas>
-    </div>
+      </div>
 
   </section>
+
   <div id="modalDetail" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeModal()">&times;</span>
       <h3>Detail Kendaraan</h3>
+
       <table id="detailTable">
         <thead>
           <tr>
@@ -1448,6 +1906,7 @@
         </thead>
         <tbody></tbody>
       </table>
+
     </div>
   </div>
   <!-- MONITORING LANGSUNG DI BAWAH -->
@@ -1559,12 +2018,30 @@
     </div>
 
   </section>
+  <section id="monitoringKontrakSectionRantau" class="report-section" style="display:none;">
+    <h1 id="titleMainRantau">Monitoring Harian VTS Pertamina Rantau</h1>
+    <div class="table-container">
+      <table class="monitoring-table">
+        <thead id="monitoringHeaderRantau"></thead>
+        <tbody id="monitoringTableBodyRantau"></tbody>
+      </table>
+    </div>
+  </section>
+  <section id="monitoringKontrakSectionPSU" class="report-section" style="display:none;">
+    <h1 id="titleMainPSU">Monitoring Harian VTS Pertamina PSU</h1>
+    <div class="table-container">
+      <table class="monitoring-table">
+        <thead id="monitoringHeaderPSU"></thead>
+        <tbody id="monitoringTableBodyPSU"></tbody>
+      </table>
+    </div>
+  </section>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <div id="detailModal" class="modal">
     <div id="detailContent" class="modal-content">
       <!-- Konten detail akan dimasukkan lewat JS -->
-
+<link rel="stylesheet" href="https://codepen.io/Deri-Hanggara/pen/abcDEF.css">
       <link rel="preconnect" href="https://fonts.googleapis.com">
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
       <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1576,14 +2053,9 @@
     </div>
   </div>
   <footer>
-    &copy;,2025 (EMD)Deri@djambi. All rights reserved.
+    &copy;,2025 (EMD)@djambi. All rights reserved.
   </footer>
 
 </body>
 
-</html>
-    <script  src="./script.js"></script>
-
-  </body>
-  
 </html>
